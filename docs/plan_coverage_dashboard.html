@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Coverage Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 40px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--surface-light);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .status-badge {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: var(--accent-warning);
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--accent-warning);
+            box-shadow: 0 0 8px var(--accent-warning);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: var(--surface);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--surface-light);
+        }
+
+        .score-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: conic-gradient(var(--accent-warning) 42.1%, var(--surface-light) 0);
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .score-inner {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: var(--surface);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-value {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .score-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .breakdown {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .narrative-card h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .narrative-card h2::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 24px;
+            background-color: var(--accent-blue);
+            border-radius: 2px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-top: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 5px;
+            bottom: 5px;
+            width: 2px;
+            background-color: var(--surface-light);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -30px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--surface-light);
+            border: 2px solid var(--surface);
+            z-index: 2;
+        }
+
+        .timeline-item.past .timeline-dot {
+            background-color: var(--accent-blue);
+        }
+        
+        .timeline-item.current .timeline-dot {
+            background-color: var(--accent-warning);
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+        }
+
+        .timeline-item.future .timeline-dot {
+            background-color: var(--surface-light);
+        }
+
+        .timeline-content h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+        }
+
+        .timeline-content p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--surface-light);
+            padding-bottom: 15px;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .icon-success { color: var(--accent-green); }
+        .icon-danger { color: var(--accent-danger); }
+
+        ul.styled-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul.styled-list li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 15px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .strong-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+
+        .risk-list li::before {
+            content: '⚠';
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--accent-danger);
+            font-weight: bold;
+        }
+
+        .gaps-section {
+            background-color: var(--surface);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid var(--surface-light);
+            border-left: 4px solid var(--accent-danger);
+        }
+
+        .gap-item {
+            background-color: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid var(--surface-light);
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .gap-item:hover {
+            background-color: rgba(15, 23, 42, 0.8);
+            transform: translateX(4px);
+        }
+
+        .gap-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .gap-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .gap-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .gap-badge {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: var(--accent-danger);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            white-space: nowrap;
+            margin-left: 15px;
+        }
+
+        .gap-desc {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        .gap-desc strong {
+            color: var(--text-main);
+        }
+
+        /* Progress bars for breakdown */
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background-color: var(--surface-light);
+            border-radius: 3px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .pb-critical { width: 54.2%; background-color: var(--accent-danger); }
+        .pb-important { width: 39.1%; background-color: var(--accent-warning); }
+        .pb-detail { width: 16.7%; background-color: var(--accent-blue); }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>Plan Coverage Evaluation</h1>
+                <p class="subtitle">Review of Implementation Plan against PRD requirements</p>
+            </div>
+            <div class="status-badge">
+                Revision Required
+            </div>
+        </header>
+
+        <div class="grid">
+            <div class="card score-card">
+                <div class="score-circle">
+                    <div class="score-inner">
+                        <div class="score-value">42%</div>
+                        <div class="score-label">Overall Coverage</div>
+                    </div>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0;">
+                    38 total requirements evaluated
+                </p>
+                
+                <div class="breakdown">
+                    <div class="breakdown-item">
+                        <div style="text-align: left; width: 100%;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Critical Requirements</span>
+                                <span style="font-weight: 600;">54%</span>
+                            </div>
+                            <div class="progress-container"><div class="progress-bar pb-critical"></div></div>
+                        </div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div style="text-align: left; width: 100%;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Important Requirements</span>
+                                <span style="font-weight: 600;">39%</span>
+                            </div>
+                            <div class="progress-container"><div class="progress-bar pb-important"></div></div>
+                        </div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div style="text-align: left; width: 100%;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Detail Requirements</span>
+                                <span style="font-weight: 600;">17%</span>
+                            </div>
+                            <div class="progress-container"><div class="progress-bar pb-detail"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card narrative-card">
+                <h2>The Narrative Arc</h2>
+                <p style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 25px;">
+                    The plan is structurally coherent but under-specified against the PRD’s behavioral contract. It serves well as a high-level outline, but lacks execution-grade completeness.
+                </p>
+                
+                <div class="timeline">
+                    <div class="timeline-item past">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <h3>1. Initial Plan (Foundation)</h3>
+                            <p>We established a solid foundation. The stack baseline, app shell, Home grouping, and headline AI features are present and map to the PRD successfully.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item current">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <h3>2. Gaps Identified (Current State)</h3>
+                            <p>Evaluation reveals missing operational guarantees. The app might "look complete" in demos but risks failing QA due to inconsistent AI mapping and weak data isolation.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item future">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <h3>3. Revised Plan (Target)</h3>
+                            <p>We must raise specificity, adding explicit acceptance criteria for data guarantees, namespace boundaries, and exact AI behavioral contracts to achieve 100%.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="two-columns">
+            <div class="card">
+                <div class="card-header">
+                    <svg class="icon-success" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <h2>What's Strong</h2>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0; margin-bottom: 20px;">
+                    These areas give stakeholders confidence in what is already handled.
+                </p>
+                <ul class="styled-list strong-list">
+                    <li><strong>Macro Architecture:</strong> Next.js runtime and Supabase persistence baseline are fully specified.</li>
+                    <li><strong>Core Product Surfaces:</strong> App shell layout, persistent Find/Settings, and prominent Home grouping are covered.</li>
+                    <li><strong>Discovery Modes:</strong> Search, Ask, Alchemy, and Explore Similar are correctly represented in the plan.</li>
+                    <li><strong>Database Tooling:</strong> Deterministic schema evolution via repeatable migrations is included.</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <svg class="icon-danger" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <h2>What's at Risk</h2>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0; margin-bottom: 20px;">
+                    Requirements that are partial or missing, posing direct risks to project success.
+                </p>
+                <ul class="styled-list risk-list">
+                    <li><strong>Operational Guarantees:</strong> Backend source-of-truth constraints and upgrade continuity are missing.</li>
+                    <li><strong>Data Isolation:</strong> Namespace lifecycle and scoped destructive operations lack boundaries.</li>
+                    <li><strong>AI Actionability:</strong> AI discovery results are inconsistently actionable without deterministic catalog mapping.</li>
+                    <li><strong>UX Micro-Contracts:</strong> Empty states, Ask-about-show handoffs, and explicit fixed recommendation counts are omitted.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="gaps-section">
+            <h2 style="margin-top: 0; margin-bottom: 25px; font-size: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                Top Critical Gaps & Why They Matter
+            </h2>
+            
+            <div class="gap-item">
+                <div class="gap-header">
+                    <h3 class="gap-title">Backend as source of truth; cache disposable</h3>
+                    <span class="gap-badge">PRD-007</span>
+                </div>
+                <p class="gap-desc"><strong>Why it matters:</strong> Correctness can silently depend on local cache behavior, causing data loss or inconsistency after storage clears, reinstalls, or multi-device usage.</p>
+            </div>
+
+            <div class="gap-item">
+                <div class="gap-header">
+                    <h3 class="gap-title">Preserve user libraries across model upgrades</h3>
+                    <span class="gap-badge">PRD-018</span>
+                </div>
+                <p class="gap-desc"><strong>Why it matters:</strong> Schema evolution can break or drop saved statuses, tags, or ratings. Losing user data is a direct trust failure for the product's core promise.</p>
+            </div>
+
+            <div class="gap-item">
+                <div class="gap-header">
+                    <h3 class="gap-title">Stable namespace isolation & scoped destructive ops</h3>
+                    <span class="gap-badge">PRD-005</span>
+                </div>
+                <p class="gap-desc"><strong>Why it matters:</strong> Benchmark and test runs can collide or inadvertently delete unrelated production data if namespace lifecycle and reset boundaries are not explicitly designed.</p>
+            </div>
+
+            <div class="gap-item">
+                <div class="gap-header">
+                    <h3 class="gap-title">Map AI recommendations to real catalog shows</h3>
+                    <span class="gap-badge">PRD-017</span>
+                </div>
+                <p class="gap-desc"><strong>Why it matters:</strong> Discovery becomes a non-actionable dead-end if AI recommendations are not reliably resolvable to real, selectable items in the app's catalog.</p>
+            </div>
+
+            <div class="gap-item">
+                <div class="gap-header">
+                    <h3 class="gap-title">Auto-save on status, interest, rating, and first tag</h3>
+                    <span class="gap-badge">PRD-010</span>
+                </div>
+                <p class="gap-desc"><strong>Why it matters:</strong> Incomplete auto-save triggers create inconsistent collection membership and surprising behavior across equivalent user actions.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
