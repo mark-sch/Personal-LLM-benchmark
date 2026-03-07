@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plan Coverage Briefing</title>
+  <style>
+    :root {
+      --bg: #f3efe8;
+      --bg-deep: #e8e0d5;
+      --panel: #fffaf2;
+      --ink: #1f2933;
+      --muted: #5c6673;
+      --ok: #0f766e;
+      --warn: #b45309;
+      --risk: #b42318;
+      --info: #1d4ed8;
+      --line: #d7ccbc;
+      --shadow: 0 10px 28px rgba(31, 41, 51, 0.1);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 0%, #efe7da 0%, transparent 50%),
+        radial-gradient(circle at 85% 100%, #e7efe9 0%, transparent 45%),
+        linear-gradient(160deg, var(--bg) 0%, var(--bg-deep) 100%);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      width: min(1200px, calc(100% - 48px));
+      margin: 24px auto 32px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: linear-gradient(130deg, #fff9ef 0%, #f7efe3 65%, #f0e6da 100%);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 38px;
+      line-height: 1.05;
+      font-weight: 800;
+    }
+
+    .subtitle {
+      margin-top: 10px;
+      font-size: 16px;
+      line-height: 1.45;
+      color: #334155;
+      max-width: 68ch;
+    }
+
+    .source {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .score-panel {
+      display: grid;
+      place-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.56);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .donut {
+      width: 190px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: conic-gradient(var(--warn) 0deg 131.4deg, #eedfca 131.4deg 360deg);
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+
+    .donut::before {
+      content: "";
+      width: 128px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: #fff7eb;
+      border: 1px solid #e6d8c2;
+      position: absolute;
+    }
+
+    .score {
+      position: relative;
+      font-size: 40px;
+      font-weight: 800;
+      line-height: 1;
+      color: #8a4b08;
+    }
+
+    .score small {
+      font-size: 18px;
+      font-weight: 700;
+      color: #8a4b08;
+    }
+
+    .status-chip {
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      border: 1px solid #e2b975;
+      color: #7a4208;
+      background: #fff2d8;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      line-height: 1.15;
+    }
+
+    .card p {
+      margin: 0;
+      color: #334155;
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .arc {
+      grid-column: span 7;
+    }
+
+    .mix {
+      grid-column: span 5;
+    }
+
+    .arc-track {
+      margin-top: 10px;
+      border-top: 2px dashed #c8baa6;
+      position: relative;
+      padding-top: 24px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: start;
+      gap: 12px;
+    }
+
+    .node {
+      background: #fff;
+      border: 1px solid #dbcdb8;
+      border-radius: 14px;
+      padding: 12px;
+      min-height: 108px;
+    }
+
+    .node .label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+    }
+
+    .node .value {
+      margin-top: 6px;
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .delta {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .arrow {
+      align-self: center;
+      font-size: 26px;
+      color: #82603a;
+      font-weight: 900;
+      margin-top: 18px;
+    }
+
+    .score-row {
+      display: grid;
+      grid-template-columns: 150px 1fr 56px;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .score-row .name {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      color: #435266;
+    }
+
+    .bar {
+      height: 10px;
+      border-radius: 999px;
+      background: #eadfce;
+      overflow: hidden;
+      border: 1px solid #deceb7;
+    }
+
+    .fill {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+    }
+
+    .fill.critical { background: #a63a2d; }
+    .fill.important { background: #c96d21; }
+    .fill.detail { background: #6b7280; }
+
+    .score-row .pct {
+      text-align: right;
+      font-weight: 700;
+      font-size: 13px;
+      color: #334155;
+    }
+
+    .full { color: var(--ok); }
+    .partial { color: var(--warn); }
+    .missing { color: var(--risk); }
+
+    .counts {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .pill {
+      border: 1px solid #d9ccb8;
+      border-radius: 12px;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .pill .k {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .pill .v {
+      margin-top: 4px;
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .strengths,
+    .risks {
+      grid-column: span 12;
+    }
+
+    .split {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 14px;
+    }
+
+    .list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .list li {
+      border: 1px solid #deceb8;
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .list .title {
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: #596579;
+    }
+
+    .risk-callout {
+      border: 1px solid #f1c3bf;
+      background: #fff5f4;
+      color: #7a271a;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 14px;
+      line-height: 1.45;
+      margin-top: 10px;
+    }
+
+    .area-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .area {
+      border: 1px solid #deceb8;
+      border-radius: 12px;
+      background: #fff;
+      padding: 10px;
+    }
+
+    .area .name {
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .area .stat {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #5a6471;
+    }
+
+    .gaps {
+      grid-column: span 12;
+    }
+
+    .gap-grid {
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .gap {
+      border: 1px solid #efb9b3;
+      background: #fff7f6;
+      border-radius: 12px;
+      padding: 10px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .gap .id {
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #8f3022;
+      font-weight: 800;
+    }
+
+    .gap .headline {
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.2;
+      color: #7a271a;
+    }
+
+    .gap .impact {
+      font-size: 12px;
+      line-height: 1.35;
+      color: #7c3a2f;
+    }
+
+    .footer {
+      color: #5a6471;
+      font-size: 12px;
+      line-height: 1.4;
+      text-align: right;
+      margin-top: 2px;
+    }
+
+    @media (max-width: 1100px) {
+      .hero { grid-template-columns: 1fr; }
+      .arc, .mix, .strengths, .risks, .gaps { grid-column: span 12; }
+      .split { grid-template-columns: 1fr; }
+      .gap-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 640px) {
+      .wrap { width: calc(100% - 24px); margin: 12px auto 18px; }
+      h1 { font-size: 30px; }
+      .gap-grid { grid-template-columns: 1fr; }
+      .area-grid { grid-template-columns: 1fr; }
+      .score-row { grid-template-columns: 120px 1fr 50px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Stakeholder Coverage Brief</div>
+        <h1>PRD Plan Coverage Is <span style="color:#8a4b08">36.5%</span> and Not Release-Ready</h1>
+        <p class="subtitle">
+          The plan has strong scaffolding (runtime baseline and core feature lanes), but most PRD behaviors are still only partial or missing.
+          Risk concentrates in data integrity, save/remove semantics, and AI contract quality.
+        </p>
+        <div class="source">
+          Source: <code>docs/EVAL_plan_coverage.md</code> (63 requirements across 11 functional areas)
+        </div>
+      </div>
+      <div class="score-panel">
+        <div class="donut" aria-label="Overall coverage score">
+          <div class="score">36.5<small>%</small></div>
+        </div>
+        <div class="status-chip">Confidence: Low</div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card arc">
+        <h2>Before/After Arc</h2>
+        <p>
+          Current checkpoint shows no measurable lift yet between initial and revised plan artifacts. The audit identified precise gaps, but those gaps are still present in the latest scored plan.
+        </p>
+        <div class="arc-track">
+          <div class="node">
+            <div class="label">Initial Plan</div>
+            <div class="value">36.5%</div>
+            <div class="delta">Baseline scored from PRD-aligned audit.</div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="node">
+            <div class="label">Revised Plan</div>
+            <div class="value">36.5%</div>
+            <div class="delta">No score lift yet (Δ 0.0 points).</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card mix">
+        <h2>Coverage Mix</h2>
+        <p>Only 3 requirements are fully covered. Most requirements are still at risk.</p>
+        <div class="counts">
+          <div class="pill">
+            <div class="k">Full</div>
+            <div class="v full">3</div>
+          </div>
+          <div class="pill">
+            <div class="k">Partial</div>
+            <div class="v partial">40</div>
+          </div>
+          <div class="pill">
+            <div class="k">Missing</div>
+            <div class="v missing">20</div>
+          </div>
+        </div>
+
+        <div class="score-row">
+          <div class="name">Critical</div>
+          <div class="bar"><div class="fill critical" data-pct="42.0"></div></div>
+          <div class="pct">42.0%</div>
+        </div>
+        <div class="score-row">
+          <div class="name">Important</div>
+          <div class="bar"><div class="fill important" data-pct="35.7"></div></div>
+          <div class="pct">35.7%</div>
+        </div>
+        <div class="score-row">
+          <div class="name">Detail</div>
+          <div class="bar"><div class="fill detail" data-pct="0.0"></div></div>
+          <div class="pct">0.0%</div>
+        </div>
+      </article>
+
+      <article class="card strengths">
+        <h2>What’s Strong</h2>
+        <p>Confidence comes from architectural alignment and core surface scaffolding already present in the plan.</p>
+        <div class="split">
+          <ul class="list">
+            <li>
+              <div class="title">Infrastructure baseline is aligned</div>
+              <div class="meta">Next.js + Supabase baseline is explicitly committed (critical requirements met).</div>
+            </li>
+            <li>
+              <div class="title">Collection home structure is defined</div>
+              <div class="meta">Home fetch, filtering, and status-grouped rendering are planned, giving a clear build path.</div>
+            </li>
+            <li>
+              <div class="title">Discovery surfaces are in scope end-to-end</div>
+              <div class="meta">Ask, Scoop, Concepts, Explore Similar, and Alchemy all appear in phased execution.</div>
+            </li>
+          </ul>
+          <div class="area-grid" aria-label="Top area scores">
+            <div class="area">
+              <div class="name">Collection Home / Filters</div>
+              <div class="stat">Score 50.0 • 1 full / 3 partial / 1 missing</div>
+            </div>
+            <div class="area">
+              <div class="name">Infra / Execution / Isolation</div>
+              <div class="stat">Score 45.0 • 2 full / 5 partial / 3 missing</div>
+            </div>
+            <div class="area">
+              <div class="name">Concepts / Similar / Alchemy</div>
+              <div class="stat">Score 41.7 • 0 full / 5 partial / 1 missing</div>
+            </div>
+            <div class="area">
+              <div class="name">Ask Chat / Mentions</div>
+              <div class="stat">Score 40.0 • 0 full / 4 partial / 1 missing</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card risks">
+        <h2>What’s At Risk</h2>
+        <p>
+          Risk is concentrated, not random. Most remaining work is behavioral contract work: persistence semantics,
+          merge safety, AI structure/guardrails, and destructive-test-safe infrastructure.
+        </p>
+
+        <div class="risk-callout">
+          <strong>Risk signal:</strong> 60 of 63 requirements are still partial or missing. <strong>23 of 25 critical requirements</strong> are not fully covered.
+          If implementation starts from this state, QA will likely fail on data correctness and AI behavior consistency first.
+        </div>
+
+        <div class="split" style="margin-top:12px;">
+          <ul class="list">
+            <li>
+              <div class="title">Critical missing requirements (6)</div>
+              <div class="meta">PRD-010, PRD-012, PRD-016, PRD-021, PRD-023, PRD-057</div>
+            </li>
+            <li>
+              <div class="title">Largest risk clusters by area</div>
+              <div class="meta">Collection Membership & My Data (25.0), AI Voice/Quality (30.0), Person Detail (0.0), Data Persistence (37.5).</div>
+            </li>
+            <li>
+              <div class="title">Most visible stakeholder failure mode</div>
+              <div class="meta">A feature-complete UI that still fails expected save/remove defaults, cross-surface data consistency, and recommendation trust.</div>
+            </li>
+          </ul>
+          <div class="area-grid">
+            <div class="area">
+              <div class="name">Collection Membership & My Data</div>
+              <div class="stat">8 reqs • 0 full • 4 partial • 4 missing</div>
+            </div>
+            <div class="area">
+              <div class="name">Person Detail Experience</div>
+              <div class="stat">2 reqs • 0 full • 0 partial • 2 missing</div>
+            </div>
+            <div class="area">
+              <div class="name">AI Voice / Prompting / Quality</div>
+              <div class="stat">5 reqs • 0 full • 3 partial • 2 missing</div>
+            </div>
+            <div class="area">
+              <div class="name">Data Persistence / Merge</div>
+              <div class="stat">8 reqs • 0 full • 6 partial • 2 missing</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card gaps">
+        <h2>Top Gaps and Why They Matter</h2>
+        <p>These are the highest-impact blockers from the audit, ranked by severity and delivery risk.</p>
+        <div class="gap-grid">
+          <div class="gap">
+            <div class="id">PRD-010 • Critical</div>
+            <div class="headline">Backend truth and cache/reset safety</div>
+            <div class="impact">Without this, data can diverge between server and clients and test resets become unreliable.</div>
+          </div>
+          <div class="gap">
+            <div class="id">PRD-012 • Critical</div>
+            <div class="headline">Per-field timestamp conflict model</div>
+            <div class="impact">Merge logic cannot preserve user edits safely under sync and catalog refreshes.</div>
+          </div>
+          <div class="gap">
+            <div class="id">PRD-016 • Critical</div>
+            <div class="headline">Upgrade continuity for user libraries</div>
+            <div class="impact">Schema evolution risks user data loss, which is a direct release blocker.</div>
+          </div>
+          <div class="gap">
+            <div class="id">PRD-021 • Critical</div>
+            <div class="headline">Autosave default semantics</div>
+            <div class="impact">Core journeys like rate-to-save and tag-to-save will behave unexpectedly without these defaults.</div>
+          </div>
+          <div class="gap">
+            <div class="id">PRD-057 • Critical</div>
+            <div class="headline">Secret handling and server-only elevated keys</div>
+            <div class="impact">Credential leakage and invalid benchmark security posture become likely.</div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <div class="footer">
+      Built from <code>docs/EVAL_plan_coverage.md</code>. Update this page after each revised plan + re-evaluation cycle.
+    </div>
+  </main>
+
+  <script>
+    const fills = document.querySelectorAll('.fill[data-pct]');
+    fills.forEach((el) => {
+      const pct = Math.max(0, Math.min(100, Number(el.dataset.pct || 0)));
+      requestAnimationFrame(() => {
+        el.style.transition = 'width 900ms ease';
+        el.style.width = pct + '%';
+      });
+    });
+  </script>
+</body>
+</html>
