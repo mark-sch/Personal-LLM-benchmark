@@ -67,6 +67,9 @@ ios/build/
 .env.*
 !.env.example
 
+# Claude Code skills (local workflow tools)
+.claude/skills/
+
 # Editors
 .idea/
 *.iml
