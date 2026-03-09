@@ -90,3 +90,5 @@ __pycache__/
 .venv/
 venv/
 
+# Downloaded evaluator bundle (kept out of the public benchmark repo)
+evaluator/

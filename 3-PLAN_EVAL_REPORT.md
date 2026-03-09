@@ -1,7 +1,11 @@
 # VISUALIZE GAPS
 
 ## Overview
-This file is used to visualize the gaps in the plan. It is used to tell the coverage story to stakeholders who will never read the raw tables. This step is not used until after an entire plan has been written and the coverage has been evaluated.
+This file is now a manual fallback for regenerating `results/PLAN_EVAL_REPORT.html` when `results/PLAN_EVAL.md` already exists.
+
+Normal benchmark collection should no longer use this as a separate required step. Step 2 now produces both `results/PLAN_EVAL.md` and `results/PLAN_EVAL_REPORT.html` in one run.
+
+Use this file only if you need to re-render the HTML report without rerunning the evaluation.
 
 ## Gaps / Coverage File Location
 
@@ -9,6 +13,8 @@ The file is called `PLAN_EVAL.md`. It is in the `results/` folder.
 
 ## Instructions
 Build a single-file HTML page that tells the coverage story to stakeholders who will never read the raw tables.
+Treat `results/PLAN_EVAL.md` as the fixed source of truth for requirements, scores, and gaps. Do not reopen the PRD, do not recompute the denominator, and do not reinterpret coverage from scratch in this step.
+
 Audience: A product lead or VP who needs to understand in under 60 seconds — what does this plan cover well, where are the risks, and how confident should they be in this plan's readiness?
 The page must communicate ALL of the following (how you present them is up to you):
 1) The overall coverage score — make it prominent and immediately legible.
