@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan Evaluation Report</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181a24;
+    --surface2: #1e2130;
+    --border: #2a2d3e;
+    --text: #e2e4ed;
+    --text-dim: #8b8fa3;
+    --accent: #6c72ff;
+    --accent-glow: rgba(108, 114, 255, 0.15);
+    --green: #34d399;
+    --green-bg: rgba(52, 211, 153, 0.1);
+    --amber: #fbbf24;
+    --amber-bg: rgba(251, 191, 36, 0.1);
+    --red: #f87171;
+    --red-bg: rgba(248, 113, 113, 0.1);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  /* Header */
+  .header {
+    padding: 48px 0 40px;
+    border-bottom: 1px solid var(--border);
+  }
+  .header .label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .header h1 {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .header .subtitle {
+    font-size: 16px;
+    color: var(--text-dim);
+  }
+
+  /* Score Hero */
+  .score-hero {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 32px;
+    padding: 48px 0;
+  }
+
+  .score-ring-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .score-ring {
+    width: 220px;
+    height: 220px;
+    transform: rotate(-90deg);
+  }
+  .score-ring-bg {
+    fill: none;
+    stroke: var(--surface2);
+    stroke-width: 10;
+  }
+  .score-ring-fill {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-dasharray: 565.48;
+    stroke-dashoffset: 25.44;
+    transition: stroke-dashoffset 1s ease;
+    filter: drop-shadow(0 0 12px rgba(108, 114, 255, 0.4));
+  }
+  .score-ring-text {
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .score-ring-text .value {
+    font-size: 52px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    background: linear-gradient(135deg, #6c72ff, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .score-ring-text .unit {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-dim);
+  }
+  .score-ring-text .label {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .score-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .score-details .intro {
+    font-size: 17px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+  .tier-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .tier-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .tier-card .tier-label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .tier-card .tier-score {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .tier-card .tier-count {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .tier-card.critical .tier-score { color: var(--accent); }
+  .tier-card.important .tier-score { color: var(--green); }
+  .tier-card.detail .tier-score { color: var(--amber); }
+
+  /* Section styles */
+  .section {
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+  }
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+  .section-subtitle {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-bottom: 28px;
+  }
+
+  /* Narrative cards */
+  .narrative-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .narrative-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+  .narrative-card.full {
+    grid-column: 1 / -1;
+  }
+  .narrative-card h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  .narrative-card p {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+  .narrative-card .tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+  .tag.strength { background: var(--green-bg); color: var(--green); }
+  .tag.weakness { background: var(--amber-bg); color: var(--amber); }
+  .tag.risk { background: var(--red-bg); color: var(--red); }
+  .tag.guidance { background: var(--accent-glow); color: var(--accent); }
+
+  /* Gaps */
+  .gaps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .gap-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    border-left: 3px solid var(--amber);
+  }
+  .gap-card.critical-gap {
+    border-left-color: var(--red);
+  }
+  .gap-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .gap-id {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+  .gap-severity {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .gap-severity.important { background: var(--amber-bg); color: var(--amber); }
+  .gap-severity.critical { background: var(--red-bg); color: var(--red); }
+  .gap-title {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .gap-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  /* Coverage bar */
+  .coverage-bar-container {
+    margin-top: 24px;
+  }
+  .coverage-bar-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+  .coverage-bar {
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    background: var(--surface2);
+  }
+  .coverage-bar .full { background: var(--green); }
+  .coverage-bar .partial { background: var(--amber); }
+  .coverage-bar .missing { background: var(--red); }
+
+  /* Table */
+  .coverage-table-wrap {
+    overflow-x: auto;
+    margin-top: 16px;
+  }
+  .coverage-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .coverage-table thead th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .coverage-table tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    font-size: 13px;
+  }
+  .coverage-table tbody tr:hover {
+    background: var(--surface2);
+  }
+  .coverage-table .id-cell {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-weight: 600;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .cov-full { color: var(--green); font-weight: 600; }
+  .cov-partial { color: var(--amber); font-weight: 600; }
+  .cov-missing { color: var(--red); font-weight: 600; }
+
+  /* Footer */
+  .footer {
+    padding: 32px 0;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-dim);
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .score-hero { grid-template-columns: 1fr; text-align: center; }
+    .tier-cards { grid-template-columns: 1fr; }
+    .narrative-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="container">
+  <div class="header">
+    <div class="label">Benchmark Evaluation &mdash; Step 2</div>
+    <h1>Plan Evaluation Report</h1>
+    <div class="subtitle">Personal TV + Movie Companion App &mdash; Coverage audit against 99 requirements across 10 functional areas</div>
+  </div>
+
+  <!-- Score Hero -->
+  <div class="score-hero">
+    <div class="score-ring-container">
+      <svg class="score-ring" viewBox="0 0 200 200">
+        <circle class="score-ring-bg" cx="100" cy="100" r="90"/>
+        <circle class="score-ring-fill" cx="100" cy="100" r="90"/>
+      </svg>
+      <div class="score-ring-text">
+        <div class="value">94</div>
+        <div class="unit">%</div>
+        <div class="label">Coverage</div>
+      </div>
+    </div>
+    <div class="score-details">
+      <p class="intro">
+        This plan demonstrates strong architectural coverage with concrete implementation details across most functional areas. The score of <strong>93.9%</strong> reflects 90 fully addressed requirements, 6 partial, and 3 missing items &mdash; with gaps concentrated in behavioral specifications and cross-cutting concerns.
+      </p>
+      <div class="tier-cards">
+        <div class="tier-card critical">
+          <div class="tier-label">Critical</div>
+          <div class="tier-score">96.7%</div>
+          <div class="tier-count">29 of 30 requirements</div>
+        </div>
+        <div class="tier-card important">
+          <div class="tier-label">Important</div>
+          <div class="tier-score">92.5%</div>
+          <div class="tier-count">59 of 67 requirements</div>
+        </div>
+        <div class="tier-card detail">
+          <div class="tier-label">Detail</div>
+          <div class="tier-score">100%</div>
+          <div class="tier-count">2 of 2 requirements</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Coverage Bar -->
+  <div class="coverage-bar-container">
+    <div class="coverage-bar-labels">
+      <span>90 Full (90.9%)</span>
+      <span>6 Partial (6.1%)</span>
+      <span>3 Missing (3.0%)</span>
+    </div>
+    <div class="coverage-bar">
+      <div class="full" style="width: 90.9%;"></div>
+      <div class="partial" style="width: 6.1%;"></div>
+      <div class="missing" style="width: 3.0%;"></div>
+    </div>
+  </div>
+
+  <!-- Top Gaps -->
+  <div class="section">
+    <div class="section-title">Top Gaps</div>
+    <div class="section-subtitle">Requirements that need attention before implementation</div>
+    <div class="gaps-list">
+      <div class="gap-card critical-gap">
+        <div class="gap-header">
+          <span class="gap-id">PRD-033</span>
+          <span class="gap-severity important">Important</span>
+          <span class="gap-title">Sync libraries/settings consistently and merge duplicates</span>
+        </div>
+        <div class="gap-desc">The plan covers field-level merge logic and cloud_settings storage, but does not address the cross-device sync mechanism. A user enabling sync would get per-field updates but no guidance on how library-wide consistency is maintained or how duplicate shows from different devices are merged.</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-header">
+          <span class="gap-id">PRD-052</span>
+          <span class="gap-severity important">Important</span>
+          <span class="gap-title">Prioritize motion-rich header with graceful fallback</span>
+        </div>
+        <div class="gap-desc">The MediaHeader component is named generically without specifying trailer-first behavior or the graceful fallback to poster-only when video is unavailable. The PRD explicitly calls for motion priority &ldquo;when present, but never block reading.&rdquo;</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-header">
+          <span class="gap-id">PRD-063</span>
+          <span class="gap-severity important">Important</span>
+          <span class="gap-title">Gate seasons to TV and financials to movies</span>
+        </div>
+        <div class="gap-desc">The data model supports both seasons and financial data on all show types, but the plan doesn't specify the conditional rendering logic. This is a critical-states requirement that affects detail page behavior depending on media type.</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-header">
+          <span class="gap-id">PRD-077</span>
+          <span class="gap-severity important">Important</span>
+          <span class="gap-title">Order concepts by strongest aha and varied axes</span>
+        </div>
+        <div class="gap-desc">The plan mentions &ldquo;diversity across axes&rdquo; in prompt architecture but does not concretely specify that concepts should be ordered by strongest aha first or that diversity should span structural/vibe/emotional/craft axes.</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-header">
+          <span class="gap-id">PRD-091</span>
+          <span class="gap-severity important">Important</span>
+          <span class="gap-title">Validate discovery with rubric and hard-fail integrity</span>
+        </div>
+        <div class="gap-desc">The plan includes technical safeguards (catalog resolution, parse fallbacks) but does not incorporate the quality rubric (voice, taste, surprise, specificity) as a concrete validation mechanism or QA checkpoint.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Coverage Narrative -->
+  <div class="section">
+    <div class="section-title">Coverage Narrative</div>
+    <div class="section-subtitle">Synthesis and interpretation of the coverage posture</div>
+    <div class="narrative-grid">
+      <div class="narrative-card full">
+        <span class="tag guidance">Overall Posture</span>
+        <h3>A structurally strong plan with broad coverage</h3>
+        <p>This plan addresses the overwhelming majority of requirements with concrete architectural decisions, component structures, and implementation strategies. It is closest to production-ready in infrastructure, data modeling, and AI prompt architecture. The remaining gaps cluster around subtle but important behavioral specifications: cross-device sync mechanics, conditional UI gating, and prompt-level quality controls that the PRD treats as non-negotiable.</p>
+      </div>
+      <div class="narrative-card">
+        <span class="tag strength">Strengths</span>
+        <h3>Strength Clusters</h3>
+        <p>The plan is exceptionally strong in <strong>Benchmark Runtime &amp; Isolation</strong> (17/17 requirements met), <strong>Collection Data &amp; Persistence</strong> (database schema directly maps to reference), <strong>Ask Chat</strong> (structured output contracts, parse retry logic), and <strong>AI Voice &amp; Persona</strong> (shared persona foundation with surface-specific extensions).</p>
+      </div>
+      <div class="narrative-card">
+        <span class="tag weakness">Weaknesses</span>
+        <h3>Weakness Clusters</h3>
+        <p>Gaps cluster around two patterns: <strong>cross-cutting behavioral specs</strong> (sync mechanics, conditional UI gating, concept ordering) that fall between the plan's component-oriented structure, and <strong>prompt-level quality controls</strong> where the plan specifies what prompts exist but not how quality is measured or output is ordered.</p>
+      </div>
+      <div class="narrative-card">
+        <span class="tag risk">Risk</span>
+        <h3>Risk Assessment</h3>
+        <p>The most likely failure mode: <strong>inconsistent Show Detail page behavior</strong>. Without explicit gating for seasons (TV-only) and financials (movies-only), both sections may render for all shows. Missing cross-device sync spec could cause silent data loss or duplicates. Concept ordering gap degrades the alchemy experience's core value.</p>
+      </div>
+      <div class="narrative-card">
+        <span class="tag guidance">Remediation</span>
+        <h3>Remediation Guidance</h3>
+        <p>These weaknesses call for <strong>behavioral specification additions</strong> rather than new plan sections: a conditional rendering rules subsection for Show Detail, a cross-device sync protocol note, a concept quality specification for the prompt architecture, and a decision on whether the quality rubric should be automated or documented as a human-review checkpoint.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full Coverage Table -->
+  <div class="section">
+    <div class="section-title">Full Coverage Table</div>
+    <div class="section-subtitle">All 99 requirements &mdash; click to filter by coverage level</div>
+    <div class="coverage-table-wrap">
+      <table class="coverage-table" id="coverageTable">
+        <thead>
+          <tr>
+            <th>PRD-ID</th>
+            <th>Requirement</th>
+            <th>Severity</th>
+            <th>Coverage</th>
+            <th>Evidence</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-severity="critical"><td class="id-cell">PRD-001</td><td>Use Next.js latest stable runtime</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 1 Tech Stack: Next.js (latest stable)</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-002</td><td>Use Supabase official client libraries</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 1 Backend/Persistence: Supabase; Sec 2.2 Supabase client</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-003</td><td>Ship .env.example with required variables</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 6: .env.example with all variables</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-004</td><td>Ignore .env* secrets except example</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 6: .gitignore excludes .env* except .env.example</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-005</td><td>Configure build through env without code edits</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 6: all config via .env.example; config/env.ts</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-006</td><td>Keep secrets out of repo and server-only</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 6: SERVICE_ROLE_KEY server-only comment</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-007</td><td>Provide app, test, reset command scripts</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 6: dev, build, start, test, test:reset</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-008</td><td>Include repeatable schema evolution artifacts</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 3.3: idempotent SQL migration files</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-009</td><td>Use one stable namespace per build</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 2: namespace_id; Sec 5.1: injected from env</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-010</td><td>Isolate namespaces and scope destructive resets</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 3.2: RLS scoped by namespace+user; Sec 8: namespace-scoped tests</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-011</td><td>Attach every user record to user_id</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 3: all tables reference user_id</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-012</td><td>Partition persisted data by namespace and user</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 3.1: all tables include namespace_id + user_id</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-013</td><td>Support documented dev auth injection, prod-gated</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.1: X-User-Id header, auth/resolver abstraction</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-014</td><td>Real OAuth later needs no schema redesign</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.1: config + wiring change, no schema redesign</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-015</td><td>Keep backend as persisted source of truth</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 2: server-side data ownership</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-016</td><td>Make client cache safe to discard</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 7: client cache is disposable</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-017</td><td>Avoid Docker requirement for cloud-agent compatibility</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>No Docker mentioned; hosted Supabase path</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-018</td><td>Overlay saved user data on every show appearance</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 2: user's version takes precedence everywhere</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-019</td><td>Support visible statuses plus hidden Next</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 3: my_status CHECK includes next</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-020</td><td>Map Interested/Excited chips to Later interest</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 5.2: Status=Later, Interest=Interested</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-021</td><td>Support free-form multi-tag personal tag library</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 3: my_tags TEXT[]; Sec 5.7: tag filters</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-022</td><td>Define collection membership by assigned status</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 5.2: my_status IS NOT NULL filter</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-023</td><td>Save shows from status, interest, rating, tagging</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 5.2: all listed as save triggers</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-024</td><td>Default save to Later/Interested except rating-save Done</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 5.2: Later/Interested default; rating -> Done</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-025</td><td>Removing status deletes show and all My Data</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 5.2: DELETE row clears all My Data</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-026</td><td>Re-add preserves My Data and refreshes public data</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 5.2: preserve My Data, refresh metadata</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-027</td><td>Track per-field My Data modification timestamps</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 3: per-field *_update_date columns</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-028</td><td>Use timestamps for sorting, sync, freshness</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 3.2: index for sorting; Sec 5.2: DESC order</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-029</td><td>Persist Scoop only for saved shows, 4h freshness</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 5.4.1: 4hr check; persist only if in collection</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-030</td><td>Keep Ask and Alchemy state session-only</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.4.2: Ask session; Sec 5.5: Alchemy state machine</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-031</td><td>Resolve AI recommendations to real selectable shows</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 5.4.4: catalog resolution + fallback</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-032</td><td>Show collection and rating tile indicators</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 9: status badges, rating indicator</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-033</td><td>Sync libraries/settings consistently and merge duplicates</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-partial">Partial</td><td>Merge logic exists; sync trigger + duplicate detection unspecified</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-034</td><td>Preserve saved libraries across data-model upgrades</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 7: idempotent migrations, version tracking</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-035</td><td>Persist synced settings, local settings, UI state</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 3: cloud_settings, local_settings, ui_state tables</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-036</td><td>Keep provider IDs persisted and detail fetches transient</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 3: provider_data JSONB; transient list in schema</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-037</td><td>Merge catalog fields safely and maintain timestamps</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 5.3: selectFirstNonEmpty + timestamp resolution</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-038</td><td>Provide filters panel and main screen destinations</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: FiltersPanel, Sec 5.7: sidebar filters</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-039</td><td>Keep Find/Discover in persistent primary navigation</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: Header.tsx Global nav (Find, Settings)</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-040</td><td>Keep Settings in persistent primary navigation</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: Header.tsx includes Settings</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-041</td><td>Offer Search, Ask, Alchemy discover modes</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: app/find/ with search/, ask/, alchemy/</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-042</td><td>Show only library items matching active filters</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.7: composed filter query</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-043</td><td>Group home into Active, Excited, Interested, Others</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.2: group by status sections</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-044</td><td>Support All, tag, genre, decade, score, media filters</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.7: all filter types specified</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-045</td><td>Render poster, title, and My Data badges</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: ShowTile: Poster + title + My Data badges</td></tr>
+          <tr data-severity="detail"><td class="id-cell">PRD-046</td><td>Provide empty-library and empty-filter states</td><td><span style="color:var(--amber)">Detail</span></td><td class="cov-full">Full</td><td>Sec 9: empty states specified</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-047</td><td>Search by title or keywords</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.3: client.search(query)</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-048</td><td>Use poster grid with collection markers</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: MediaGrid, Sec 9: poster grid design</td></tr>
+          <tr data-severity="detail"><td class="id-cell">PRD-049</td><td>Auto-open Search when setting is enabled</td><td><span style="color:var(--amber)">Detail</span></td><td class="cov-full">Full</td><td>Sec 5.8: local_settings.auto_search</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-050</td><td>Keep Search non-AI in tone</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: Search path separate from AI</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-051</td><td>Preserve Show Detail narrative section order</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: component order matches spec</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-052</td><td>Prioritize motion-rich header with graceful fallback</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-partial">Partial</td><td>Component named but trailer-first + fallback unspecified</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-053</td><td>Surface year, runtime/seasons, and community score early</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: CoreFacts.tsx, narrative position 2</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-054</td><td>Place status/interest controls in toolbar</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: StatusChips.tsx</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-055</td><td>Auto-save unsaved tagged show as Later/Interested</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 5.2: tag triggers save with defaults</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-056</td><td>Auto-save unsaved rated show as Done</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 5.2: rating -> Done exception</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-057</td><td>Show overview early for fast scanning</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: OverviewScoop.tsx, narrative position 4</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-058</td><td>Scoop shows correct states and progressive feedback</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.4.1: stream response progressively</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-059</td><td>Ask-about-show deep-link seeds Ask context</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.4.2: pre-seed with show context</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-060</td><td>Include traditional recommendations strand</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: Recommendations.tsx component</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-061</td><td>Explore Similar uses CTA-first concept flow</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.6: Get Concepts -> Explore Shows flow</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-062</td><td>Include streaming availability and person-linking credits</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: StreamingAvail.tsx, CastCrew.tsx</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-063</td><td>Gate seasons to TV and financials to movies</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-partial">Partial</td><td>Data model supports both; conditional rendering unspecified</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-064</td><td>Keep primary actions early and page not overwhelming</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: narrative order, Sec 9: design system</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-065</td><td>Provide conversational Ask chat interface</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.4.2: chat flow; AskChat.tsx</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-066</td><td>Answer directly with confident, spoiler-safe recs</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 10: spoiler-safe persona; Sec 5.4.2</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-067</td><td>Show horizontal mentioned-shows strip from chat</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.4.2: parse structured showList</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-068</td><td>Open Detail from mentions or Search fallback</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.4.4: interactive tile or Search handoff</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-069</td><td>Show six random starter prompts with refresh</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.4.2: 6 random from 80-prompt library</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-070</td><td>Summarize older turns while preserving voice</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.4.2: 1-2 sentence summary preserving persona</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-071</td><td>Seed Ask-about-show sessions with show handoff</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.4.2: pre-seed with show context</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-072</td><td>Emit commentary plus exact showList contract</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 5.4.5: commentary + showList format; mentioned-shows.ts</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-073</td><td>Retry malformed mention output once, then fallback</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.4.5: retry once + fallback</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-074</td><td>Redirect Ask back into TV/movie domain</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 10: TV/movie focus in base persona</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-075</td><td>Treat concepts as taste ingredients, not genres</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 10: vibe/structure/thematic ingredients</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-076</td><td>Return bullet-only, 1-3 word, non-generic concepts</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 10: 1-3 words, evocative, no generics</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-077</td><td>Order concepts by strongest aha and varied axes</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-partial">Partial</td><td>Mentions diversity but not ordering by aha-strength</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-078</td><td>Require concept selection and guide ingredient picking</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-partial">Partial</td><td>Selection cap specified but UI guidance not specified</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-079</td><td>Return exactly five Explore Similar recommendations</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.4.4: 5 recs Explore Similar, 6 Alchemy</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-080</td><td>Support full Alchemy loop with chaining</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.5: 4-step flow + state machine</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-081</td><td>Clear downstream results when inputs change</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.5: resetting downstream state</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-082</td><td>Generate shared multi-show concepts with larger pool</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.4.3: larger pool for multi-show</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-083</td><td>Cite selected concepts in concise recommendation reasons</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.4.4: reasons reflect selected concepts</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-084</td><td>Deliver surprising but defensible taste-aligned recs</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.4.4: catalog resolution; Sec 12: risk mitigation</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-085</td><td>Keep one consistent AI persona across surfaces</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 10: base.ts in every surface prompt</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-086</td><td>Enforce shared AI guardrails across all surfaces</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 10: red lines; base persona inclusion</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-087</td><td>Make AI warm, joyful, and light in critique</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 10: joy-forward persona</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-088</td><td>Structure Scoop as personal taste mini-review</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.4.1: scoop structure; Sec 10: scoop.ts</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-089</td><td>Keep Ask brisk and dialogue-like by default</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 10: friend in dialogue persona</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-090</td><td>Feed AI the right surface-specific context inputs</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.4.x: surface-specific context building</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-091</td><td>Validate discovery with rubric and hard-fail integrity</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-partial">Partial</td><td>Catalog resolution covers integrity; rubric as human QA only</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-092</td><td>Show person gallery, name, and bio</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: PersonDetail.tsx; Phase 5</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-093</td><td>Include ratings, genres, projects-by-year analytics</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: analytics in PersonDetail</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-094</td><td>Group filmography by year</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: filmography in PersonDetail</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-095</td><td>Open Show Detail from selected credit</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 4: CastCrew -> show detail linking</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-096</td><td>Include font size and Search-on-launch settings</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.8: font size, auto_search</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-097</td><td>Support username, model, and API-key settings safely</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.8: cloud_settings table</td></tr>
+          <tr data-severity="critical"><td class="id-cell">PRD-098</td><td>Export saved shows and My Data as zip</td><td><span style="color:var(--accent)">Critical</span></td><td class="cov-full">Full</td><td>Sec 5.8: /api/export, .zip with backup.json</td></tr>
+          <tr data-severity="important"><td class="id-cell">PRD-099</td><td>Encode export dates using ISO-8601</td><td><span style="color:var(--amber)">Important</span></td><td class="cov-full">Full</td><td>Sec 5.8: ISO-8601 export date</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    Generated from PLAN_EVAL.md &mdash; Benchmark Evaluation Step 2 &mdash; 99 requirements across 10 functional areas
+  </div>
+</div>
+
+<script>
+  // Filter table by severity
+  const filterButtons = document.querySelectorAll('[data-filter]');
+  const table = document.getElementById('coverageTable');
+
+  // Add filter buttons to the section-subtitle area
+  const subtitleEl = table.parentElement.previousElementSibling;
+  const filterContainer = document.createElement('div');
+  filterContainer.style.cssText = 'margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;';
+
+  const filters = [
+    { label: 'All', value: 'all' },
+    { label: 'Critical', value: 'critical' },
+    { label: 'Important', value: 'important' },
+    { label: 'Detail', value: 'detail' },
+    { label: 'Full', value: 'full' },
+    { label: 'Partial', value: 'partial' },
+    { label: 'Missing', value: 'missing' },
+  ];
+
+  filters.forEach(f => {
+    const btn = document.createElement('button');
+    btn.textContent = f.label;
+    btn.style.cssText = `
+      padding: 4px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-dim);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    `;
+    btn.addEventListener('click', () => {
+      const rows = table.querySelectorAll('tbody tr');
+      rows.forEach(row => {
+        const sev = row.getAttribute('data-severity') || '';
+        const cov = row.cells[3].textContent.toLowerCase();
+        let show = f.value === 'all';
+        if (f.value === 'critical' || f.value === 'important' || f.value === 'detail') {
+          show = sev === f.value;
+        } else {
+          show = cov === f.value;
+        }
+        row.style.display = show ? '' : 'none';
+      });
+    });
+    filterContainer.appendChild(btn);
+  });
+
+  subtitleEl.appendChild(filterContainer);
+</script>
+
+</body>
+</html>
