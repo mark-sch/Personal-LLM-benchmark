@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan Evaluation Report</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --surface: #181b21;
+    --surface-2: #1e222a;
+    --text: #e8ecf1;
+    --text-muted: #9aa3b2;
+    --accent: #3b82f6;
+    --accent-glow: rgba(59,130,246,0.25);
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --border: #2a2f3a;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 32px;
+  }
+  header {
+    margin-bottom: 48px;
+  }
+  header h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  header .subtitle {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+  }
+  .score-hero {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 32px;
+    margin-bottom: 48px;
+    align-items: start;
+  }
+  .score-ring {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    text-align: center;
+  }
+  .score-ring .score-value {
+    font-size: 4rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .score-ring .score-label {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .score-ring .score-sub {
+    margin-top: 16px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+  .score-breakdown {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .breakdown-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .breakdown-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+  }
+  .breakdown-card.critical::before { background: var(--success); }
+  .breakdown-card.important::before { background: var(--warning); }
+  .breakdown-card.detail::before { background: var(--accent); }
+  .breakdown-card .tier-name {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .breakdown-card .tier-score {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .breakdown-card .tier-count {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+  .arc-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 32px;
+  }
+  .arc-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .arc-section h2 .icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--accent-glow);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+  }
+  .arc-section p {
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+  .arc-section p strong {
+    color: var(--text);
+  }
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+  }
+  .card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card h3 .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .card h3 .dot.green { background: var(--success); box-shadow: 0 0 8px var(--success); }
+  .card h3 .dot.red { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+  .card ul {
+    list-style: none;
+  }
+  .card ul li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .card ul li:last-child { border-bottom: none; }
+  .card ul li .check { color: var(--success); font-weight: 700; flex-shrink: 0; }
+  .card ul li .x { color: var(--danger); font-weight: 700; flex-shrink: 0; }
+  .gaps-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 32px;
+  }
+  .gaps-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .gaps-section h2 .icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: rgba(239,68,68,0.15);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: var(--danger);
+  }
+  .gap-item {
+    padding: 20px;
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    margin-bottom: 16px;
+    border-left: 3px solid var(--danger);
+  }
+  .gap-item:last-child { margin-bottom: 0; }
+  .gap-item .gap-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .gap-item .gap-id {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 0.8rem;
+    background: var(--bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: var(--text-muted);
+  }
+  .gap-item .severity {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .severity.critical { background: rgba(239,68,68,0.15); color: var(--danger); }
+  .severity.important { background: rgba(245,158,11,0.15); color: var(--warning); }
+  .gap-item .gap-title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text);
+  }
+  .gap-item .gap-desc {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin-top: 8px;
+  }
+  .summary-bar {
+    display: flex;
+    gap: 8px;
+    margin-top: 24px;
+  }
+  .summary-pill {
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .summary-pill.full { background: rgba(34,197,94,0.12); color: var(--success); }
+  .summary-pill.partial { background: rgba(245,158,11,0.12); color: var(--warning); }
+  .summary-pill.missing { background: rgba(239,68,68,0.12); color: var(--danger); }
+  .footer {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  @media (max-width: 900px) {
+    .score-hero { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .score-breakdown { grid-template-columns: 1fr; }
+    .container { padding: 24px 16px; }
+    header h1 { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Plan Evaluation Report</h1>
+  <p class="subtitle">TV &amp; Movie Companion App &mdash; Coverage audit against canonical requirements</p>
+</header>
+
+<div class="score-hero">
+  <div class="score-ring">
+    <div class="score-value">91.4%</div>
+    <div class="score-label">Overall Coverage</div>
+    <div class="score-sub">99 requirements evaluated<br>83 full &middot; 15 partial &middot; 1 missing</div>
+  </div>
+  <div class="score-breakdown">
+    <div class="breakdown-card critical">
+      <div class="tier-name">Critical</div>
+      <div class="tier-score" style="color: var(--success)">96.7%</div>
+      <div class="tier-count">28 of 30 requirements fully covered<br>2 partial &middot; 0 missing</div>
+    </div>
+    <div class="breakdown-card important">
+      <div class="tier-name">Important</div>
+      <div class="tier-score" style="color: var(--warning)">89.6%</div>
+      <div class="tier-count">54 of 67 requirements fully covered<br>12 partial &middot; 1 missing</div>
+    </div>
+    <div class="breakdown-card detail">
+      <div class="tier-name">Detail</div>
+      <div class="tier-score" style="color: var(--accent)">75.0%</div>
+      <div class="tier-count">1 of 2 requirements fully covered<br>1 partial &middot; 0 missing</div>
+    </div>
+  </div>
+</div>
+
+<div class="arc-section">
+  <h2><span class="icon">&#x2192;</span> The Story</h2>
+  <p>
+    We started with a <strong>structurally sound plan</strong> that demonstrates solid understanding of the PRD's core intent.
+    The infrastructure layer is nearly complete: namespace isolation, auth injection, schema evolution, and server-side persistence
+    are all well-specified. The Show Detail page preserves the exact narrative hierarchy, and every auto-save rule is explicitly stated.
+  </p>
+  <p style="margin-top: 12px">
+    <strong>Where we landed:</strong> 91.4% overall coverage with 96.7% on critical items. The remaining gaps are not architectural
+    showstoppers, but they represent real product risks: data loss during schema evolution, unvalidated AI discovery quality,
+    and incomplete persistence for local settings. These are the gaps that separate a working MVP from a production-ready product.
+  </p>
+</div>
+
+<div class="two-col">
+  <div class="card">
+    <h3><span class="dot green"></span> What's Strong</h3>
+    <ul>
+      <li><span class="check">&#x2713;</span> Benchmark Runtime &amp; Isolation &mdash; namespace isolation, RLS, dev auth all specified</li>
+      <li><span class="check">&#x2713;</span> Show Detail &amp; Relationship UX &mdash; exact section order, all auto-save rules</li>
+      <li><span class="check">&#x2713;</span> AI Integration &mdash; guardrails, structured outputs, retry logic, persona consistency</li>
+      <li><span class="check">&#x2713;</span> Data Model &mdash; timestamps, merge policy, provider storage all correct</li>
+      <li><span class="check">&#x2713;</span> Settings &amp; Export &mdash; zip export with ISO-8601 dates explicitly planned</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3><span class="dot red"></span> What's At Risk</h3>
+    <ul>
+      <li><span class="x">&#x2717;</span> No migration strategy for data-model upgrades &mdash; user collections at risk</li>
+      <li><span class="x">&#x2717;</span> No AI discovery quality validation &mdash; could ship poor recommendations undetected</li>
+      <li><span class="x">&#x2717;</span> Missing `Next` status in data model &mdash; blocks future up-next queue</li>
+      <li><span class="x">&#x2717;</span> Local settings/UI state storage not specified &mdash; preferences may not persist</li>
+      <li><span class="x">&#x2717;</span> Client cache disposal not explicitly committed &mdash; backend-first contract at risk</li>
+    </ul>
+  </div>
+</div>
+
+<div class="gaps-section">
+  <h2><span class="icon">!</span> Top 5 Gaps &mdash; Why They Matter</h2>
+
+  <div class="gap-item">
+    <div class="gap-header">
+      <span class="gap-id">PRD-034</span>
+      <span class="severity critical">Critical</span>
+    </div>
+    <div class="gap-title">Preserve saved libraries across data-model upgrades</div>
+    <div class="gap-desc">
+      The plan tracks a <code>data_model_version</code> but provides no migration strategy. When the schema inevitably changes,
+      user collections could be orphaned or destroyed. This is a catastrophic breach of the "Your data is yours" product principle
+      and would require emergency remediation post-launch.
+    </div>
+  </div>
+
+  <div class="gap-item">
+    <div class="gap-header">
+      <span class="gap-id">PRD-016</span>
+      <span class="severity critical">Critical</span>
+    </div>
+    <div class="gap-title">Make client cache safe to discard</div>
+    <div class="gap-desc">
+      The plan designs for server-side persistence but never explicitly commits to disposable client cache. With SWR or React Query,
+      developers may treat local cache as authoritative during optimistic updates or brief disconnections. Without explicit acceptance
+      criteria, the backend-first contract can silently erode.
+    </div>
+  </div>
+
+  <div class="gap-item">
+    <div class="gap-header">
+      <span class="gap-id">PRD-091</span>
+      <span class="severity important">Important</span>
+    </div>
+    <div class="gap-title">Validate discovery with rubric and hard-fail integrity</div>
+    <div class="gap-desc">
+      The testing strategy covers parsers and mappers but completely omits AI quality validation. No rubric-based scoring,
+      no golden-set regression tests, no hard-fail checks for hallucinated titles. The product could ship with generic concepts,
+      off-brand voice, or fake recommendations &mdash; and the team would have zero automated signal.
+    </div>
+  </div>
+
+  <div class="gap-item">
+    <div class="gap-header">
+      <span class="gap-id">PRD-019</span>
+      <span class="severity important">Important</span>
+    </div>
+    <div class="gap-title">Support visible statuses plus hidden <code>Next</code></div>
+    <div class="gap-desc">
+      The data model's status enum omits <code>Next</code> entirely. The PRD specifies it as an optional/hidden status present
+      in the data model. Without it, the "up-next" queue concept cannot be implemented later without a schema migration,
+      closing off a future product direction.
+    </div>
+  </div>
+
+  <div class="gap-item">
+    <div class="gap-header">
+      <span class="gap-id">PRD-035</span>
+      <span class="severity important">Important</span>
+    </div>
+    <div class="gap-title">Persist synced settings, local settings, UI state</div>
+    <div class="gap-desc">
+      While <code>cloud_settings</code> covers synced data, the plan never specifies where local-only settings (font size,
+      auto-search) or UI state (last selected filter, confirmation preferences) live. This gap leads to inconsistent
+      persistence behavior and potential loss of user preferences across sessions.
+    </div>
+  </div>
+</div>
+
+<div class="arc-section">
+  <h2><span class="icon">&#x270E;</span> Remediation Guidance</h2>
+  <p>
+    <strong>For data persistence gaps:</strong> Add explicit acceptance criteria around cache behavior and design a migration
+    framework (not just a version field). Specify where local settings and UI state are stored &mdash; whether in Supabase,
+    localStorage, or another mechanism.
+  </p>
+  <p style="margin-top: 12px">
+    <strong>For concept/Alchemy gaps:</strong> Add UX specification for how concepts are ordered, how users are guided to
+    select ingredients, and how multi-show concept pools differ from single-show pools. The mechanics are correct; the craft
+    needs definition.
+  </p>
+  <p style="margin-top: 12px">
+    <strong>For quality validation:</strong> This is the highest-value remaining work. Add a dedicated section on AI output
+    quality testing: rubric-based evaluation, golden-set regression tests, and automated prompt-evaluation pipelines.
+    Without this, the core discovery value proposition is unguarded.
+  </p>
+</div>
+
+<div class="summary-bar">
+  <div class="summary-pill full">83 Full</div>
+  <div class="summary-pill partial">15 Partial</div>
+  <div class="summary-pill missing">1 Missing</div>
+  <div class="summary-pill" style="background: var(--surface-2); color: var(--text-muted);">99 Total</div>
+</div>
+
+<div class="footer">
+  Generated from PLAN_EVAL.md &mdash; Canonical catalog: requirements_catalog_v1.md
+</div>
+
+</div>
+</body>
+</html>
