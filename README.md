@@ -64,17 +64,17 @@ All completed benchmark runs are stored in the [`results/`](results/) folder, or
 
 | Rank | Agent / Tool | Model | Overall | Critical | Important | Detail | Req. Total |
 |:---:|:---|:---|:---:|:---:|:---:|:---:|:---:|
-| 🥇 | **Kimi CLI** | Kimi K2.6 preview | **92.4%** | 100.0% | 88.8% | 100.0% | 99 |
-| 🥈 | **Claude Code** | Kimi K2.6 preview | **91.4%** | 96.7% | 89.6% | 75.0% | 99 |
-| 🥉 | **Claude Code** | Opus 4.6 (high) | **89.7%** | 93.3% | 87.1% | 87.5% | 73 |
+| 🥇 | **Kimi CLI** | [Kimi K2.6 preview](results/Kimi_CLI_@_Kimi_K2.6_preview/PLAN_EVAL_REPORT.html) | **92.4%** | 100.0% | 88.8% | 100.0% | 99 |
+| 🥈 | **Claude Code** | [Kimi K2.6 preview](results/Claude_Code_@_Kimi_K2.6_preview/PLAN_EVAL_REPORT.html) | **91.4%** | 96.7% | 89.6% | 75.0% | 99 |
+| 🥉 | **Claude Code** | [Opus 4.6 (high)](results/Claude_Code_@_Opus_4.6_high/PLAN_EVAL_REPORT.html) | **89.7%** | 93.3% | 87.1% | 87.5% | 73 |
 | 4 | **Codex CLI** | GPT 5.3 Codex (xhigh) | **88.5%** | 91.9% | 88.1% | 75.0% | 87 |
 | 5 | **Claude Code** | Opus 4.5 | **82.9%** | 85.0% | 82.9% | 77.8% | 70 |
-| 6 | **Claude Code** | Sonnet 4.6 (high) | **75.6%** | 82.1% | 71.9% | 75.0% | 78 |
+| 6 | **Claude Code** | [Sonnet 4.6 (high)](results/Claude_Code_@_Sonnet_4.6_high/PLAN_EVAL_REPORT.html) | **75.6%** | 82.1% | 71.9% | 75.0% | 78 |
 | 7 | **Claude Code** | Sonnet 4.5 | **66.5%** | 74.4% | 60.6% | 62.5% | 94 |
-| 8 | **Gemini CLI** (no plan mode) | Gemini 3.2 Pro | **49.4%** | 69.1% | 40.5% | 7.1% | 83 |
-| 9 | **Antigravity** | Gemini 3.2 Pro | **47.5%** | 63.3% | 42.5% | 20.0% | 80 |
-| 10 | **Cursor** | Gemini 3.2 Pro | **42.1%** | 54.2% | 39.1% | 16.7% | 38 |
-| 11 | **Gemini CLI** | Gemini 3.2 Pro | **36.5%** | 42.0% | 35.7% | 0.0% | 63 |
+| 8 | **Gemini CLI** (no plan mode) | [Gemini 3.2 Pro](results/Gemini_CLI_no_plan_@_Gemini_3.2_Pro/PLAN_EVAL_REPORT.html) | **49.4%** | 69.1% | 40.5% | 7.1% | 83 |
+| 9 | **Antigravity** | [Gemini 3.2 Pro](results/Antigravity_@_Gemini_3.2_Pro/PLAN_EVAL_REPORT.html) | **47.5%** | 63.3% | 42.5% | 20.0% | 80 |
+| 10 | **Cursor** | [Gemini 3.2 Pro](results/Cursor_@_Gemini_3.2_Pro/PLAN_EVAL_REPORT.html) | **42.1%** | 54.2% | 39.1% | 16.7% | 38 |
+| 11 | **Gemini CLI** | [Gemini 3.2 Pro](results/Gemini_CLI_@_Gemini_3.2_Pro/PLAN_EVAL_REPORT.html) | **36.5%** | 42.0% | 35.7% | 0.0% | 63 |
 
 > **Note:** Requirement totals vary slightly across runs because some evaluators extracted or consolidated requirements differently. The frozen canonical catalog is the authoritative denominator, but agents may produce plans of varying scope that influence how evaluators count. For a fair comparison, focus on the **Overall** score, which is always normalized against the run's own denominator.
 
