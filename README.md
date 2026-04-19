@@ -15,8 +15,8 @@ This repository contains a standardized benchmark for evaluating the planning ca
 | 🥇 | **Kimi CLI** | [Kimi K2.6 preview](results/Kimi_CLI_@_Kimi_K2.6_preview/PLAN_EVAL_REPORT.html) | **92.4%** | 100.0% | 88.8% | 100.0% | 99 |
 | 🥈 | **Claude Code** | [Kimi K2.6 preview](results/Claude_Code_@_Kimi_K2.6_preview/PLAN_EVAL_REPORT.html) | **91.4%** | 96.7% | 89.6% | 75.0% | 99 |
 | 🥉 | **Claude Code** | [Opus 4.6 (high)](results/Claude_Code_@_Opus_4.6_high/PLAN_EVAL_REPORT.html) | **89.7%** | 93.3% | 87.1% | 87.5% | 73 |
-| 4 | **Kimi CLI** | [Qwen3.5-35B-uncensored](results/Kimi_CLI_@_Qwen3.5-35B-uncensored/PLAN_EVAL_REPORT.html) | **85.4%** | 96.7% | 80.6% | 75.0% | 99 |
-| 5 | **Codex CLI** | GPT 5.3 Codex (xhigh) | **88.5%** | 91.9% | 88.1% | 75.0% | 87 |
+| 4 | **Codex CLI** | GPT 5.3 Codex (xhigh) | **88.5%** | 91.9% | 88.1% | 75.0% | 87 |
+| 5 | **Kimi CLI** | [Qwen3.5-35B-uncensored](results/Kimi_CLI_@_Qwen3.5-35B-uncensored/PLAN_EVAL_REPORT.html) | **85.4%** | 96.7% | 80.6% | 75.0% | 99 |
 | 6 | **Claude Code** | Opus 4.5 | **82.9%** | 85.0% | 82.9% | 77.8% | 70 |
 | 7 | **Claude Code** | [Sonnet 4.6 (high)](results/Claude_Code_@_Sonnet_4.6_high/PLAN_EVAL_REPORT.html) | **75.6%** | 82.1% | 71.9% | 75.0% | 78 |
 | 8 | **Claude Code** | Sonnet 4.5 | **66.5%** | 74.4% | 60.6% | 62.5% | 94 |
