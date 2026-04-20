@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan Coverage Report</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface-2: #232734;
+    --border: #2e3348;
+    --text: #e8eaf0;
+    --text-muted: #8b90a5;
+    --accent: #6c5ce7;
+    --accent-light: #a29bfe;
+    --green: #00cec9;
+    --green-bg: rgba(0,206,201,0.12);
+    --yellow: #fdcb6e;
+    --yellow-bg: rgba(253,203,110,0.12);
+    --red: #ff6b6b;
+    --red-bg: rgba(255,107,107,0.12);
+    --blue: #74b9ff;
+    --blue-bg: rgba(116,185,255,0.12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 40px 32px; }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 48px 0 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+  .header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .header p {
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+
+  /* Score Hero */
+  .score-hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    padding: 48px 0;
+    margin-bottom: 48px;
+  }
+  .score-ring {
+    position: relative;
+    width: 200px;
+    height: 200px;
+  }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-ring .bg { stroke: var(--surface-2); }
+  .score-ring .fill { stroke: var(--green); stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+  .score-value {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .score-value .number { font-size: 48px; font-weight: 800; color: var(--green); }
+  .score-value .label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+  .score-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .score-summary .item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+  }
+  .score-summary .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .score-summary .dot.full { background: var(--green); }
+  .score-summary .dot.partial { background: var(--yellow); }
+  .score-summary .dot.missing { background: var(--red); }
+  .score-summary .count { font-weight: 700; min-width: 28px; }
+  .score-summary .desc { color: var(--text-muted); }
+
+  /* Severity Cards */
+  .severity-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+  .severity-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .severity-card .tier-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .severity-card .tier-score {
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .severity-card .tier-detail {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .severity-card .bar-track {
+    height: 6px;
+    background: var(--surface-2);
+    border-radius: 3px;
+    margin-top: 16px;
+    overflow: hidden;
+  }
+  .severity-card .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s ease;
+  }
+
+  /* Section Headers */
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--accent);
+    display: inline-block;
+  }
+  .section { margin-bottom: 48px; }
+
+  /* Strength & Risk Blocks */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+  .col-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .col-block h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .col-block h3 .icon { font-size: 20px; }
+  .col-block ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .col-block li {
+    font-size: 14px;
+    color: var(--text-muted);
+    padding-left: 16px;
+    position: relative;
+  }
+  .col-block li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+  .strength-block li::before { background: var(--green); }
+  .risk-block li::before { background: var(--red); }
+
+  /* Top Gaps */
+  .gap-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .gap-card:last-child { margin-bottom: 0; }
+  .gap-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .gap-id {
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--red-bg);
+    color: var(--red);
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+  .gap-severity {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .gap-severity.critical { background: var(--red-bg); color: var(--red); }
+  .gap-severity.important { background: var(--yellow-bg); color: var(--yellow); }
+  .gap-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .gap-why {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-top: 4px;
+  }
+
+  /* Area Chart */
+  .area-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .area-row {
+    display: grid;
+    grid-template-columns: 220px 1fr 48px;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+  }
+  .area-name {
+    color: var(--text-muted);
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .area-bar-track {
+    height: 22px;
+    background: var(--surface-2);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+  }
+  .area-bar-full {
+    background: var(--green);
+    height: 100%;
+    transition: width 0.8s ease;
+  }
+  .area-bar-partial {
+    background: var(--yellow);
+    height: 100%;
+    transition: width 0.8s ease;
+  }
+  .area-bar-missing {
+    background: var(--red);
+    height: 100%;
+    transition: width 0.8s ease;
+  }
+  .area-pct {
+    font-weight: 700;
+    font-size: 13px;
+    text-align: right;
+  }
+
+  /* Narrative */
+  .narrative {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 48px;
+  }
+  .narrative h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    margin-top: 24px;
+    color: var(--accent-light);
+  }
+  .narrative h3:first-child { margin-top: 0; }
+  .narrative p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 8px;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 32px 0;
+    color: var(--text-muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 48px;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .severity-row { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .score-hero { flex-direction: column; gap: 24px; }
+    .area-row { grid-template-columns: 160px 1fr 48px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Plan Coverage Report</h1>
+    <p>Implementation Plan — Personal TV &amp; Movie Companion</p>
+  </div>
+
+  <!-- Score Hero -->
+  <div class="score-hero">
+    <div class="score-ring">
+      <svg width="200" height="200">
+        <circle class="bg" cx="100" cy="100" r="88" fill="none" stroke-width="12"/>
+        <circle class="fill" cx="100" cy="100" r="88" fill="none" stroke-width="12"
+          stroke-dasharray="553" stroke-dashoffset="64"/>
+      </svg>
+      <div class="score-value">
+        <span class="number">88.4%</span>
+        <span class="label">Overall</span>
+      </div>
+    </div>
+    <div class="score-summary">
+      <div class="item">
+        <span class="dot full"></span>
+        <span class="count">79</span>
+        <span class="desc">requirements fully covered</span>
+      </div>
+      <div class="item">
+        <span class="dot partial"></span>
+        <span class="count">19</span>
+        <span class="desc">requirements partially covered</span>
+      </div>
+      <div class="item">
+        <span class="dot missing"></span>
+        <span class="count">1</span>
+        <span class="desc">requirement not addressed</span>
+      </div>
+      <div class="item" style="margin-top:8px; padding-top:8px; border-top:1px solid var(--border);">
+        <span class="count" style="min-width:40px;">99</span>
+        <span class="desc">total requirements across 10 functional areas</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Severity Scores -->
+  <div class="severity-row">
+    <div class="severity-card">
+      <div class="tier-label">Critical Requirements</div>
+      <div class="tier-score" style="color:var(--green)">98.3%</div>
+      <div class="tier-detail">29.5 of 30 critical requirements</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:98.3%;background:var(--green)"></div>
+      </div>
+    </div>
+    <div class="severity-card">
+      <div class="tier-label">Important Requirements</div>
+      <div class="tier-score" style="color:var(--yellow)">85.1%</div>
+      <div class="tier-detail">57 of 67 important requirements</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:85.1%;background:var(--yellow)"></div>
+      </div>
+    </div>
+    <div class="severity-card">
+      <div class="tier-label">Detail Requirements</div>
+      <div class="tier-score" style="color:var(--green)">100%</div>
+      <div class="tier-detail">2 of 2 detail requirements</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:100%;background:var(--green)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Strengths & Risks -->
+  <div class="two-col">
+    <div class="col-block strength-block">
+      <h3><span class="icon">✦</span> What's Strong</h3>
+      <ul>
+        <li><strong style="color:var(--text)">Benchmark Runtime &amp; Isolation</strong> — Nearly perfect at 97%. Every infra-rider requirement addressed with middleware, RLS policies, env-driven config, namespace partitioning, and one-command scripts.</li>
+        <li><strong style="color:var(--text)">Collection Data &amp; Persistence</strong> — Robust merge policy, comprehensive timestamp tracking, detailed schema evolution, and correct auto-save semantics for all four triggers.</li>
+        <li><strong style="color:var(--text)">Show Detail &amp; Relationship UX</strong> — Section order matches the PRD narrative hierarchy exactly. Auto-save rules for tags, ratings, and status are precise and testable.</li>
+        <li><strong style="color:var(--text)">Settings &amp; Export</strong> — Complete coverage including ISO-8601 dates, safe API-key handling, font size scaling, and ZIP export.</li>
+        <li><strong style="color:var(--text)">Person Detail</strong> — All four requirements (gallery, analytics, filmography by year, navigation to Show Detail) fully specified.</li>
+      </ul>
+    </div>
+    <div class="col-block risk-block">
+      <h3><span class="icon">⚠</span> What's at Risk</h3>
+      <ul>
+        <li><strong style="color:var(--text)">AI Voice &amp; Persona</strong> — 8 partial/missing items in this cluster. No single persona definition; guardrails not codified as cross-cutting rules. Tonal drift across Scoop, Ask, and Recommendations is the #1 risk.</li>
+        <li><strong style="color:var(--text)">AI Quality Validation</strong> — Zero coverage. No scoring rubric, no hard-fail integrity check, no golden set. Hallucinated shows could reach users unchecked.</li>
+        <li><strong style="color:var(--text)">Persistent Navigation</strong> — Routes defined but no always-visible navigation chrome. Find/Discover and Settings may be unreachable from deep pages.</li>
+        <li><strong style="color:var(--text)">Data Sync Protocol</strong> — Timestamps exist but no sync protocol or duplicate-merge strategy. Cross-device users could encounter conflicting states.</li>
+        <li><strong style="color:var(--text)">Concept Philosophy</strong> — Concept generation rules are present but the "taste ingredient vs genre" philosophy and ordering/diversity constraints are underspecified.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Coverage by Functional Area -->
+  <div class="section">
+    <div class="section-title">Coverage by Functional Area</div>
+    <div class="area-bars">
+      <!-- Benchmark Runtime & Isolation: 16 full, 1 partial = (16+0.5)/17 = 97.1% -->
+      <div class="area-row">
+        <span class="area-name">Benchmark Runtime &amp; Isolation</span>
+        <div class="area-bar-track">
+          <div class="area-bar-full" style="width:94.1%"></div>
+          <div class="area-bar-partial" style="width:2.9%"></div>
+        </div>
+        <span class="area-pct" style="color:var(--green)">97.1%</span>
+      </div>
+      <!-- Collection Data & Persistence: 16 full, 3 partial = (16+1.5)/20 = 87.5% -->
+      <div class="area-row">
+        <span class="area-name">Collection Data &amp; Persistence</span>
+        <div class="area-bar-track">
+          <div class="area-bar-full" style="width:80%"></div>
+          <div class="area-bar-partial" style="width:7.5%"></div>
+        </div>
+        <span class="area-pct" style="color:var(--green)">87.5%</span>
+      </div>
+      <!-- App Navigation & Discover Shell: 1 full, 3 partial = (1+1.5)/4 = 62.5% -->
+      <div class="area-row">
+        <span class="area-name">App Navigation &amp; Discover Shell</span>
+        <div class="area-bar-track">
+          <div class="area-bar-full" style="width:25%"></div>
+          <div class="area-bar-partial" style="width:37.5%"></div>
+        </div>
+        <span class="area-pct" style="color:var(--yellow)">62.5%</span>
+      </div>
+      <!-- Collection Home & Search: 9 full, 0 partial = 100% -->
+      <div class="area-row">
+        <span class="area-name">Collection Home &amp; Search</span>
+        <div class="area-bar-track">
+          <div class="area-bar-full" style="width:100%"></div>
+        </div>
+        <span class="area-pct" style="color:var(--green)">100%</span>
+      </div>
+      <!-- Show Detail & Relationship UX: 12 full, 2 partial = (12+1)/14 = 92.9% -->
+      <div class="area-row">
+        <span class="area-name">Show Detail &amp; Relationship UX</span>
+        <div class="area-bar-track">
+          <div class="area-bar-full" style="width:85.7%"></div>
+          <div class="area-bar-partial" style="width:7.1%"></div>
+        </div>
+        <span class="area-pct" style="color:var(--green)">92.9%</span>
+      </div>
+      <!-- Ask Chat: 7 full, 3 partial = (7+1.5)/10 = 85% -->
+      <div class="area-row">
+        <span class="area-name">Ask Chat</span>
+        <div class="area-bar-track">
+          <div class="area-bar-full" style="width:70%"></div>
+          <div class="area-bar-partial" style="width:15%"></div>
+        </div>
+        <span class="area-pct" style="color:var(--green)">85.0%</span>
+      </div>
+      <!-- Concepts, Explore Similar & Alchemy: 7 full, 3 partial = (7+1.5)/10 = 85% -->
+      <div class="area-row">
+        <span class="area-name">Concepts, Explore Similar &amp; Alchemy</span>
+        <div class="area-bar-track">
+          <div class="area-bar-full" style="width:70%"></div>
+          <div class="area-bar-partial" style="width:15%"></div>
+        </div>
+        <span class="area-pct" style="color:var(--green)">85.0%</span>
+      </div>
+      <!-- AI Voice, Persona & Quality: 2 full, 4 partial, 1 missing = (2+2)/7 = 57.1% -->
+      <div class="area-row">
+        <span class="area-name">AI Voice, Persona &amp; Quality</span>
+        <div class="area-bar-track">
+          <div class="area-bar-full" style="width:28.6%"></div>
+          <div class="area-bar-partial" style="width:28.6%"></div>
+          <div class="area-bar-missing" style="width:14.3%"></div>
+        </div>
+        <span class="area-pct" style="color:var(--yellow)">57.1%</span>
+      </div>
+      <!-- Person Detail: 4 full = 100% -->
+      <div class="area-row">
+        <span class="area-name">Person Detail</span>
+        <div class="area-bar-track">
+          <div class="area-bar-full" style="width:100%"></div>
+        </div>
+        <span class="area-pct" style="color:var(--green)">100%</span>
+      </div>
+      <!-- Settings & Export: 4 full = 100% -->
+      <div class="area-row">
+        <span class="area-name">Settings &amp; Export</span>
+        <div class="area-bar-track">
+          <div class="area-bar-full" style="width:100%"></div>
+        </div>
+        <span class="area-pct" style="color:var(--green)">100%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top 5 Gaps -->
+  <div class="section">
+    <div class="section-title">Top 5 Gaps</div>
+
+    <div class="gap-card">
+      <div class="gap-header">
+        <span class="gap-id">PRD-086</span>
+        <span class="gap-severity critical">critical</span>
+        <span class="gap-label">Enforce shared AI guardrails across all surfaces</span>
+      </div>
+      <div class="gap-why">The plan mentions shared inputs and individual service prompts but does not codify the four shared guardrails — spoiler-safe defaults, TV/movie domain boundary, opinionated honesty, and actionable recommendations — as a cross-cutting rule set applied to every AI surface. Without this, individual AI services could drift from the product's behavioral contract, producing generic, spoiler-heavy, or off-domain responses that erode user trust in the app's "heart."</div>
+    </div>
+
+    <div class="gap-card">
+      <div class="gap-header">
+        <span class="gap-id">PRD-091</span>
+        <span class="gap-severity important">important</span>
+        <span class="gap-label">Validate discovery with rubric and hard-fail integrity</span>
+      </div>
+      <div class="gap-why">The plan includes no mechanism for validating AI output quality. The PRD specifies a scoring rubric (voice, taste alignment, surprise, specificity, real-show integrity) with a hard-fail on real-show integrity. Without this, hallucinated show titles, wrong external IDs, or off-brand AI responses could reach users with no automated check to catch them.</div>
+    </div>
+
+    <div class="gap-card">
+      <div class="gap-header">
+        <span class="gap-id">PRD-085</span>
+        <span class="gap-severity important">important</span>
+        <span class="gap-label">Keep one consistent AI persona across surfaces</span>
+      </div>
+      <div class="gap-why">Each AI service section defines its own prompt in isolation. There is no single persona definition that all services reference or import. This risks tonal inconsistency where Ask feels like a chatbot while Scoop reads like a critic, breaking the "one consistent persona" contract that makes the app feel like talking to one friend, not four different tools.</div>
+    </div>
+
+    <div class="gap-card">
+      <div class="gap-header">
+        <span class="gap-id">PRD-066</span>
+        <span class="gap-severity important">important</span>
+        <span class="gap-label">Answer directly with confident, spoiler-safe recommendations</span>
+      </div>
+      <div class="gap-why">The Ask prompt design lacks specificity about response structure. The PRD requires a direct answer within 3–5 lines, confident picks, and bulleted lists for multi-recommendations. Without these constraints, Ask responses could default to verbose, hedging essays that bury the recommendation a user came for.</div>
+    </div>
+
+    <div class="gap-card">
+      <div class="gap-header">
+        <span class="gap-id">PRD-033</span>
+        <span class="gap-severity important">important</span>
+        <span class="gap-label">Sync libraries/settings consistently and merge duplicates</span>
+      </div>
+      <div class="gap-why">The plan mentions field-level timestamps for conflict resolution but does not describe a sync protocol, duplicate detection algorithm, or merge strategy across devices. Without this specification, cross-device users could encounter data loss, conflicting states, or duplicate entries in their collection.</div>
+    </div>
+  </div>
+
+  <!-- Coverage Narrative -->
+  <div class="narrative">
+    <h3>Overall Posture</h3>
+    <p>This is a structurally strong plan that addresses the vast majority of requirements with concrete, implementable specifications. The infrastructure and data layers are thorough — namespace isolation, merge policies, timestamp tracking, and schema evolution are all well-specified. The plan's primary weakness is not in what it builds but in how it governs AI behavior: the AI voice, guardrails, and quality validation are described at the service level rather than codified as cross-cutting contracts. A stakeholder should feel confident about the app's data integrity and feature completeness, but should flag the AI governance gap as something that needs tightening before AI surfaces ship to users.</p>
+
+    <h3>Strength Clusters</h3>
+    <p>The plan is strongest in three areas. <strong>Benchmark Runtime &amp; Isolation</strong> is nearly perfect — every infra-rider requirement is addressed with specific implementation details including middleware, RLS policies, and env-driven configuration. <strong>Collection Data &amp; Persistence</strong> is equally robust, with a detailed merge policy, comprehensive timestamp tracking, and a migration strategy that mirrors the PRD's data behaviors precisely. <strong>Show Detail &amp; Relationship UX</strong> closely follows the narrative hierarchy from the detail page experience spec, preserving section order and auto-save semantics. These three areas represent the plan's structural backbone, and they are solid.</p>
+
+    <h3>Weakness Clusters</h3>
+    <p>The gaps cluster around <strong>AI Voice, Persona &amp; Quality</strong> — the plan treats AI as an implementation detail distributed across individual services rather than as a specifiable product surface. Eight of the twenty partial/missing items belong to the AI voice, persona, guardrails, and quality cluster. The plan defines what each AI service does but not how the shared persona, shared guardrails, or quality validation hold them together. A secondary weakness cluster is <strong>App Navigation</strong> — the plan defines routes but does not describe the persistent navigation chrome that keeps Find/Discover and Settings always reachable. These gaps suggest the plan was written with a backend-first mindset where AI personality and navigation ergonomics were deferred as "UI polish."</p>
+
+    <h3>Risk Assessment</h3>
+    <p>If executed as-is, the most likely failure mode is <strong>AI tonal drift and quality regression</strong>. Without codified shared guardrails, a persona reference, or a quality rubric, each AI surface will be built with independently authored prompts that gradually diverge. Users would first notice that Ask feels like a different entity than Scoop, then that recommendations are generic or spoiler-heavy, and finally that the app's "heart" — the consistent, opinionated, joyful companion — is missing. A QA reviewer would flag this as a brand consistency issue, not a functional bug. The secondary risk is navigation discoverability — users may struggle to find Settings or return to Find/Discover from deep within Show Detail because the persistent navigation element is unspecified.</p>
+
+    <h3>Remediation Guidance</h3>
+    <p>The AI governance gaps require <strong>cross-cutting specification work</strong>: a single shared AI guardrails document or module that all AI services import and enforce, a persona definition referenced by every prompt, and a quality validation rubric applied to AI outputs (at minimum, a hard-fail check on real-show integrity). This is not new feature work — it is architectural contract work that should be completed before Phase 7 (AI Services) begins. The navigation gaps require <strong>layout specification work</strong>: defining the persistent navigation element — sidebar, bottom bar, or top bar — with its always-visible destinations (Home, Find/Discover, Settings) as part of the app shell layout in Phase 3. Both remediation categories are about adding specificity to existing plan sections, not creating entirely new sections.</p>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Generated from PLAN_EVAL.md — 99 requirements evaluated against the canonical requirements catalog v1</p>
+  </div>
+
+</div>
+</body>
+</html>

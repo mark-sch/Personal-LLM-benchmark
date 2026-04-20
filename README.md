@@ -16,15 +16,16 @@ This repository contains a standardized benchmark for evaluating the planning ca
 | 🥈 | **Kimi CLI** | [Kimi K2.6 preview](https://htmlpreview.github.io/?https://github.com/mark-sch/Personal-LLM-benchmark/blob/main/results/Kimi_CLI_@_Kimi_K2.6_preview/PLAN_EVAL_REPORT.html) | **92.4%** | 100.0% | 88.8% | 100.0% | 99 |
 | 🥉 | **Claude Code** | [Kimi K2.6 preview](https://htmlpreview.github.io/?https://github.com/mark-sch/Personal-LLM-benchmark/blob/main/results/Claude_Code_@_Kimi_K2.6_preview/PLAN_EVAL_REPORT.html) | **91.4%** | 96.7% | 89.6% | 75.0% | 99 |
 | 4 | **Claude Code** | [Opus 4.6 (high)](https://htmlpreview.github.io/?https://github.com/mark-sch/Personal-LLM-benchmark/blob/main/results/Claude_Code_@_Opus_4.6_high/PLAN_EVAL_REPORT.html) | **89.7%** | 93.3% | 87.1% | 87.5% | 73 |
-| 5 | **Codex CLI** | GPT 5.3 Codex (xhigh) | **88.5%** | 91.9% | 88.1% | 75.0% | 87 |
-| 6 | **Kimi CLI** | [Qwen3.5-35B-uncensored](https://htmlpreview.github.io/?https://github.com/mark-sch/Personal-LLM-benchmark/blob/main/results/Kimi_CLI_@_Qwen3.5-35B-uncensored/PLAN_EVAL_REPORT.html) | **85.4%** | 96.7% | 80.6% | 75.0% | 99 |
-| 7 | **Claude Code** | Opus 4.5 | **82.9%** | 85.0% | 82.9% | 77.8% | 70 |
-| 8 | **Claude Code** | [Sonnet 4.6 (high)](https://htmlpreview.github.io/?https://github.com/mark-sch/Personal-LLM-benchmark/blob/main/results/Claude_Code_@_Sonnet_4.6_high/PLAN_EVAL_REPORT.html) | **75.6%** | 82.1% | 71.9% | 75.0% | 78 |
-| 9 | **Claude Code** | Sonnet 4.5 | **66.5%** | 74.4% | 60.6% | 62.5% | 94 |
-| 10 | **Gemini CLI** (no plan mode) | [Gemini 3.2 Pro](https://htmlpreview.github.io/?https://github.com/mark-sch/Personal-LLM-benchmark/blob/main/results/Gemini_CLI_no_plan_@_Gemini_3.2_Pro/PLAN_EVAL_REPORT.html) | **49.4%** | 69.1% | 40.5% | 7.1% | 83 |
-| 11 | **Antigravity** | [Gemini 3.2 Pro](https://htmlpreview.github.io/?https://github.com/mark-sch/Personal-LLM-benchmark/blob/main/results/Antigravity_@_Gemini_3.2_Pro/PLAN_EVAL_REPORT.html) | **47.5%** | 63.3% | 42.5% | 20.0% | 80 |
-| 12 | **Cursor** | [Gemini 3.2 Pro](https://htmlpreview.github.io/?https://github.com/mark-sch/Personal-LLM-benchmark/blob/main/results/Cursor_@_Gemini_3.2_Pro/PLAN_EVAL_REPORT.html) | **42.1%** | 54.2% | 39.1% | 16.7% | 38 |
-| 13 | **Gemini CLI** | [Gemini 3.2 Pro](https://htmlpreview.github.io/?https://github.com/mark-sch/Personal-LLM-benchmark/blob/main/results/Gemini_CLI_@_Gemini_3.2_Pro/PLAN_EVAL_REPORT.html) | **36.5%** | 42.0% | 35.7% | 0.0% | 63 |
+| 5 | **Kimi CLI** | [GLM-5.1](https://htmlpreview.github.io/?https://github.com/mark-sch/Personal-LLM-benchmark/blob/main/results/Kimi_CLI_@_GLM-5.1/PLAN_EVAL_REPORT.html) | **88.4%** | 98.3% | 85.1% | 100.0% | 99 |
+| 6 | **Codex CLI** | GPT 5.3 Codex (xhigh) | **88.5%** | 91.9% | 88.1% | 75.0% | 87 |
+| 7 | **Kimi CLI** | [Qwen3.5-35B-uncensored](https://htmlpreview.github.io/?https://github.com/mark-sch/Personal-LLM-benchmark/blob/main/results/Kimi_CLI_@_Qwen3.5-35B-uncensored/PLAN_EVAL_REPORT.html) | **85.4%** | 96.7% | 80.6% | 75.0% | 99 |
+| 8 | **Claude Code** | Opus 4.5 | **82.9%** | 85.0% | 82.9% | 77.8% | 70 |
+| 9 | **Claude Code** | [Sonnet 4.6 (high)](https://htmlpreview.github.io/?https://github.com/mark-sch/Personal-LLM-benchmark/blob/main/results/Claude_Code_@_Sonnet_4.6_high/PLAN_EVAL_REPORT.html) | **75.6%** | 82.1% | 71.9% | 75.0% | 78 |
+| 10 | **Claude Code** | Sonnet 4.5 | **66.5%** | 74.4% | 60.6% | 62.5% | 94 |
+| 11 | **Gemini CLI** (no plan mode) | [Gemini 3.2 Pro](https://htmlpreview.github.io/?https://github.com/mark-sch/Personal-LLM-benchmark/blob/main/results/Gemini_CLI_no_plan_@_Gemini_3.2_Pro/PLAN_EVAL_REPORT.html) | **49.4%** | 69.1% | 40.5% | 7.1% | 83 |
+| 12 | **Antigravity** | [Gemini 3.2 Pro](https://htmlpreview.github.io/?https://github.com/mark-sch/Personal-LLM-benchmark/blob/main/results/Antigravity_@_Gemini_3.2_Pro/PLAN_EVAL_REPORT.html) | **47.5%** | 63.3% | 42.5% | 20.0% | 80 |
+| 13 | **Cursor** | [Gemini 3.2 Pro](https://htmlpreview.github.io/?https://github.com/mark-sch/Personal-LLM-benchmark/blob/main/results/Cursor_@_Gemini_3.2_Pro/PLAN_EVAL_REPORT.html) | **42.1%** | 54.2% | 39.1% | 16.7% | 38 |
+| 14 | **Gemini CLI** | [Gemini 3.2 Pro](https://htmlpreview.github.io/?https://github.com/mark-sch/Personal-LLM-benchmark/blob/main/results/Gemini_CLI_@_Gemini_3.2_Pro/PLAN_EVAL_REPORT.html) | **36.5%** | 42.0% | 35.7% | 0.0% | 63 |
 
 > **Note:** Requirement totals vary slightly across runs because some evaluators extracted or consolidated requirements differently. The frozen canonical catalog is the authoritative denominator, but agents may produce plans of varying scope that influence how evaluators count. For a fair comparison, focus on the **Overall** score, which is always normalized against the run's own denominator.
 
