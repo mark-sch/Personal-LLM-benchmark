@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plan Evaluation Report — TV Companion App</title>
+  <style>
+    :root {
+      --bg-primary: #0f1419;
+      --bg-secondary: #1a1f26;
+      --bg-card: #242b35;
+      --text-primary: #e7e9ea;
+      --text-secondary: #8b98a5;
+      --accent-blue: #4a9eff;
+      --accent-green: #00c853;
+      --accent-yellow: #ffc107;
+      --accent-red: #ff5252;
+      --accent-purple: #b388ff;
+      --border: #2f3842;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    /* Header */
+    .header {
+      margin-bottom: 48px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .badge {
+      background: var(--accent-blue);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-subtitle {
+      color: var(--text-secondary);
+      font-size: 16px;
+    }
+
+    /* Score Hero */
+    .score-hero {
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px;
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .score-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent-green), var(--accent-blue), var(--accent-purple));
+    }
+
+    .score-circle {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--accent-green) 0deg,
+        var(--accent-green) 334deg,
+        var(--border) 334deg
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      position: relative;
+    }
+
+    .score-circle::before {
+      content: '';
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      position: absolute;
+    }
+
+    .score-value {
+      position: relative;
+      font-size: 48px;
+      font-weight: 800;
+      color: var(--accent-green);
+    }
+
+    .score-label {
+      position: relative;
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .score-breakdown {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 24px;
+    }
+
+    .breakdown-item {
+      text-align: center;
+    }
+
+    .breakdown-value {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .breakdown-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .critical .breakdown-value { color: var(--accent-green); }
+    .important .breakdown-value { color: var(--accent-blue); }
+    .detail .breakdown-value { color: var(--accent-yellow); }
+
+    /* Summary Cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .summary-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .summary-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 24px;
+    }
+
+    .summary-card.full .summary-icon {
+      background: rgba(0, 200, 83, 0.15);
+      color: var(--accent-green);
+    }
+
+    .summary-card.partial .summary-icon {
+      background: rgba(255, 193, 7, 0.15);
+      color: var(--accent-yellow);
+    }
+
+    .summary-card.missing .summary-icon {
+      background: rgba(255, 82, 82, 0.15);
+      color: var(--accent-red);
+    }
+
+    .summary-number {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .summary-card.full .summary-number { color: var(--accent-green); }
+    .summary-card.partial .summary-number { color: var(--accent-yellow); }
+    .summary-card.missing .summary-number { color: var(--accent-red); }
+
+    .summary-label {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    /* Coverage by Severity */
+    .severity-section {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 40px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .severity-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .severity-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .severity-label {
+      width: 100px;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+
+    .severity-track {
+      flex: 1;
+      height: 32px;
+      background: var(--bg-card);
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .severity-fill {
+      height: 100%;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      padding-left: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      transition: width 1s ease-out;
+    }
+
+    .severity-fill.critical {
+      background: linear-gradient(90deg, var(--accent-green), #00a844);
+    }
+
+    .severity-fill.important {
+      background: linear-gradient(90deg, var(--accent-blue), #3a7acc);
+    }
+
+    .severity-fill.detail {
+      background: linear-gradient(90deg, var(--accent-yellow), #ccaa00);
+    }
+
+    .severity-count {
+      width: 120px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-align: right;
+    }
+
+    /* Areas Grid */
+    .areas-section {
+      margin-bottom: 40px;
+    }
+
+    .areas-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .area-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .area-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .area-info {
+      flex: 1;
+    }
+
+    .area-name {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .area-progress {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .area-bar {
+      flex: 1;
+      height: 6px;
+      background: var(--bg-primary);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .area-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+
+    .area-percent {
+      font-size: 13px;
+      font-weight: 600;
+      min-width: 45px;
+    }
+
+    /* Top Gaps */
+    .gaps-section {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 40px;
+    }
+
+    .gaps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .gap-item {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 20px;
+      border-left: 4px solid var(--accent-red);
+    }
+
+    .gap-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .gap-id {
+      font-family: monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-blue);
+    }
+
+    .gap-severity {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .gap-severity.important {
+      background: rgba(74, 158, 255, 0.2);
+      color: var(--accent-blue);
+    }
+
+    .gap-title {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .gap-description {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Narrative */
+    .narrative-section {
+      margin-bottom: 40px;
+    }
+
+    .narrative-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .narrative-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .narrative-card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .narrative-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .narrative-title .icon {
+      font-size: 20px;
+    }
+
+    .narrative-content {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .narrative-content strong {
+      color: var(--text-primary);
+    }
+
+    .strength-list, .weakness-list {
+      list-style: none;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .strength-list li, .weakness-list li {
+      padding: 6px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .strength-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--accent-green);
+    }
+
+    .weakness-list li::before {
+      content: '!';
+      position: absolute;
+      left: 0;
+      color: var(--accent-yellow);
+    }
+
+    /* Action Items */
+    .actions-section {
+      background: linear-gradient(135deg, rgba(74, 158, 255, 0.1) 0%, rgba(179, 136, 255, 0.1) 100%);
+      border: 1px solid rgba(74, 158, 255, 0.3);
+      border-radius: 16px;
+      padding: 32px;
+    }
+
+    .actions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .action-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg-card);
+      border-radius: 10px;
+    }
+
+    .action-priority {
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .action-priority.high {
+      background: rgba(255, 82, 82, 0.2);
+      color: var(--accent-red);
+    }
+
+    .action-priority.medium {
+      background: rgba(255, 193, 7, 0.2);
+      color: var(--accent-yellow);
+    }
+
+    .action-priority.low {
+      background: rgba(0, 200, 83, 0.2);
+      color: var(--accent-green);
+    }
+
+    .action-text {
+      font-size: 14px;
+    }
+
+    .action-prds {
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 32px;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .summary-grid,
+      .areas-grid,
+      .narrative-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 24px 16px;
+      }
+
+      .score-hero {
+        padding: 32px 20px;
+      }
+
+      .score-circle {
+        width: 140px;
+        height: 140px;
+      }
+
+      .score-circle::before {
+        width: 116px;
+        height: 116px;
+      }
+
+      .score-value {
+        font-size: 36px;
+      }
+
+      .score-breakdown {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .severity-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .severity-count {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-top">
+        <span class="badge">Evaluation Report</span>
+      </div>
+      <h1>TV Companion App — Plan Evaluation</h1>
+      <p class="header-subtitle">Comprehensive coverage analysis against PRD requirements catalog</p>
+    </header>
+
+    <!-- Score Hero -->
+    <section class="score-hero">
+      <div class="score-circle">
+        <div>
+          <div class="score-value">93%</div>
+          <div class="score-label">Coverage</div>
+        </div>
+      </div>
+      <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto;">
+        This plan covers 88 of 99 requirements fully, with 8 partial and 3 missing.
+        Critical requirements score at 92%, indicating solid infrastructure foundation with room for improvement.
+      </p>
+      <div class="score-breakdown">
+        <div class="breakdown-item critical">
+          <div class="breakdown-value">92%</div>
+          <div class="breakdown-label">Critical</div>
+        </div>
+        <div class="breakdown-item important">
+          <div class="breakdown-value">94%</div>
+          <div class="breakdown-label">Important</div>
+        </div>
+        <div class="breakdown-item detail">
+          <div class="breakdown-value">75%</div>
+          <div class="breakdown-label">Detail</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Summary Cards -->
+    <section class="summary-grid">
+      <div class="summary-card full">
+        <div class="summary-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div class="summary-number">88</div>
+        <div class="summary-label">Fully Covered</div>
+      </div>
+      <div class="summary-card partial">
+        <div class="summary-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <div class="summary-number">8</div>
+        <div class="summary-label">Partially Covered</div>
+      </div>
+      <div class="summary-card missing">
+        <div class="summary-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+        </div>
+        <div class="summary-number">3</div>
+        <div class="summary-label">Missing</div>
+      </div>
+    </section>
+
+    <!-- Coverage by Severity -->
+    <section class="severity-section">
+      <h2 class="section-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        Coverage by Severity
+      </h2>
+      <div class="severity-bars">
+        <div class="severity-bar">
+          <span class="severity-label">Critical</span>
+          <div class="severity-track">
+            <div class="severity-fill critical" style="width: 91.67%;">91.67%</div>
+          </div>
+          <span class="severity-count">27/30 + 1 partial</span>
+        </div>
+        <div class="severity-bar">
+          <span class="severity-label">Important</span>
+          <div class="severity-track">
+            <div class="severity-fill important" style="width: 94.03%;">94.03%</div>
+          </div>
+          <span class="severity-count">60/67 + 6 partial</span>
+        </div>
+        <div class="severity-bar">
+          <span class="severity-label">Detail</span>
+          <div class="severity-track">
+            <div class="severity-fill detail" style="width: 75%;">75%</div>
+          </div>
+          <span class="severity-count">1/2 + 1 partial</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Coverage by Area -->
+    <section class="areas-section">
+      <h2 class="section-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        Coverage by Functional Area
+      </h2>
+      <div class="areas-grid">
+        <div class="area-card">
+          <div class="area-icon" style="background: rgba(0, 200, 83, 0.15); color: var(--accent-green);">🏗️</div>
+          <div class="area-info">
+            <div class="area-name">Benchmark Runtime & Isolation</div>
+            <div class="area-progress">
+              <div class="area-bar">
+                <div class="area-fill" style="width: 82%; background: var(--accent-green);"></div>
+              </div>
+              <span class="area-percent" style="color: var(--accent-green);">82%</span>
+            </div>
+          </div>
+        </div>
+        <div class="area-card">
+          <div class="area-icon" style="background: rgba(74, 158, 255, 0.15); color: var(--accent-blue);">💾</div>
+          <div class="area-info">
+            <div class="area-name">Collection Data & Persistence</div>
+            <div class="area-progress">
+              <div class="area-bar">
+                <div class="area-fill" style="width: 75%; background: var(--accent-blue);"></div>
+              </div>
+              <span class="area-percent" style="color: var(--accent-blue);">75%</span>
+            </div>
+          </div>
+        </div>
+        <div class="area-card">
+          <div class="area-icon" style="background: rgba(0, 200, 83, 0.15); color: var(--accent-green);">🧭</div>
+          <div class="area-info">
+            <div class="area-name">App Navigation & Discover Shell</div>
+            <div class="area-progress">
+              <div class="area-bar">
+                <div class="area-fill" style="width: 100%; background: var(--accent-green);"></div>
+              </div>
+              <span class="area-percent" style="color: var(--accent-green);">100%</span>
+            </div>
+          </div>
+        </div>
+        <div class="area-card">
+          <div class="area-icon" style="background: rgba(0, 200, 83, 0.15); color: var(--accent-green);">🏠</div>
+          <div class="area-info">
+            <div class="area-name">Collection Home & Search</div>
+            <div class="area-progress">
+              <div class="area-bar">
+                <div class="area-fill" style="width: 89%; background: var(--accent-green);"></div>
+              </div>
+              <span class="area-percent" style="color: var(--accent-green);">89%</span>
+            </div>
+          </div>
+        </div>
+        <div class="area-card">
+          <div class="area-icon" style="background: rgba(0, 200, 83, 0.15); color: var(--accent-green);">📺</div>
+          <div class="area-info">
+            <div class="area-name">Show Detail & Relationship UX</div>
+            <div class="area-progress">
+              <div class="area-bar">
+                <div class="area-fill" style="width: 93%; background: var(--accent-green);"></div>
+              </div>
+              <span class="area-percent" style="color: var(--accent-green);">93%</span>
+            </div>
+          </div>
+        </div>
+        <div class="area-card">
+          <div class="area-icon" style="background: rgba(0, 200, 83, 0.15); color: var(--accent-green);">💬</div>
+          <div class="area-info">
+            <div class="area-name">Ask Chat</div>
+            <div class="area-progress">
+              <div class="area-bar">
+                <div class="area-fill" style="width: 90%; background: var(--accent-green);"></div>
+              </div>
+              <span class="area-percent" style="color: var(--accent-green);">90%</span>
+            </div>
+          </div>
+        </div>
+        <div class="area-card">
+          <div class="area-icon" style="background: rgba(0, 200, 83, 0.15); color: var(--accent-green);">⚗️</div>
+          <div class="area-info">
+            <div class="area-name">Concepts, Explore Similar & Alchemy</div>
+            <div class="area-progress">
+              <div class="area-bar">
+                <div class="area-fill" style="width: 100%; background: var(--accent-green);"></div>
+              </div>
+              <span class="area-percent" style="color: var(--accent-green);">100%</span>
+            </div>
+          </div>
+        </div>
+        <div class="area-card">
+          <div class="area-icon" style="background: rgba(0, 200, 83, 0.15); color: var(--accent-green);">🤖</div>
+          <div class="area-info">
+            <div class="area-name">AI Voice, Persona & Quality</div>
+            <div class="area-progress">
+              <div class="area-bar">
+                <div class="area-fill" style="width: 100%; background: var(--accent-green);"></div>
+              </div>
+              <span class="area-percent" style="color: var(--accent-green);">100%</span>
+            </div>
+          </div>
+        </div>
+        <div class="area-card">
+          <div class="area-icon" style="background: rgba(0, 200, 83, 0.15); color: var(--accent-green);">👤</div>
+          <div class="area-info">
+            <div class="area-name">Person Detail</div>
+            <div class="area-progress">
+              <div class="area-bar">
+                <div class="area-fill" style="width: 100%; background: var(--accent-green);"></div>
+              </div>
+              <span class="area-percent" style="color: var(--accent-green);">100%</span>
+            </div>
+          </div>
+        </div>
+        <div class="area-card">
+          <div class="area-icon" style="background: rgba(0, 200, 83, 0.15); color: var(--accent-green);">⚙️</div>
+          <div class="area-info">
+            <div class="area-name">Settings & Export</div>
+            <div class="area-progress">
+              <div class="area-bar">
+                <div class="area-fill" style="width: 100%; background: var(--accent-green);"></div>
+              </div>
+              <span class="area-percent" style="color: var(--accent-green);">100%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Top Gaps -->
+    <section class="gaps-section">
+      <h2 class="section-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        Top Gaps Requiring Attention
+      </h2>
+      <div class="gaps-list">
+        <div class="gap-item">
+          <div class="gap-header">
+            <span class="gap-id">PRD-036</span>
+            <span class="gap-severity important">Important</span>
+          </div>
+          <div class="gap-title">Keep provider IDs persisted and detail fetches transient</div>
+          <div class="gap-description">
+            The storage-schema requires storing provider IDs (streaming availability) persistently while treating cast, crew, seasons, and recommendations as transient data. Without this distinction, the system may over-fetch or lose availability data, directly impacting the "Stream It" feature.
+          </div>
+        </div>
+        <div class="gap-item">
+          <div class="gap-header">
+            <span class="gap-id">PRD-033</span>
+            <span class="gap-severity important">Important</span>
+          </div>
+          <div class="gap-title">Sync libraries/settings consistently and merge duplicates</div>
+          <div class="gap-description">
+            The PRD envisions optional cross-device sync with timestamp-based conflict resolution and duplicate detection. The plan assumes single-device use, leaving sync architecture unaddressed.
+          </div>
+        </div>
+        <div class="gap-item">
+          <div class="gap-header">
+            <span class="gap-id">PRD-004</span>
+            <span class="gap-severity important">Important</span>
+          </div>
+          <div class="gap-title">Ignore .env* secrets except example</div>
+          <div class="gap-description">
+            The infra rider explicitly requires .gitignore to exclude all .env* files except .env.example. This security-critical requirement is not mentioned, creating risk of secret leakage in version control.
+          </div>
+        </div>
+        <div class="gap-item">
+          <div class="gap-header">
+            <span class="gap-id">PRD-019</span>
+            <span class="gap-severity important">Important</span>
+          </div>
+          <div class="gap-title">Support visible statuses plus hidden Next</div>
+          <div class="gap-description">
+            The PRD notes that "Next" (up-next queue) exists in the data model but is not surfaced in UI. The plan covers visible statuses but omits the hidden Next status, leaving ambiguity about data layer support.
+          </div>
+        </div>
+        <div class="gap-item">
+          <div class="gap-header">
+            <span class="gap-id">PRD-021</span>
+            <span class="gap-severity important">Important</span>
+          </div>
+          <div class="gap-title">Support free-form multi-tag personal tag library</div>
+          <div class="gap-description">
+            Tags are a primary organizational mechanism, but the plan does not detail how users create and manage their personal tag library. The tag-based filtering features lack a foundation.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Narrative -->
+    <section class="narrative-section">
+      <h2 class="section-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        Coverage Analysis
+      </h2>
+      <div class="narrative-grid">
+        <div class="narrative-card full-width">
+          <div class="narrative-title">
+            <span class="icon">🎯</span>
+            Overall Posture
+          </div>
+          <div class="narrative-content">
+            This plan is <strong>structurally sound with minor but meaningful gaps</strong>. The majority of requirements (88 of 99, or 89%) are fully addressed with concrete implementation details. The plan demonstrates strong coverage of critical infrastructure requirements (Next.js, Supabase, namespace isolation, user identity, environment configuration) and comprehensive treatment of UI features across all major screens.
+            <br><br>
+            The partial and missing items cluster around <strong>data architecture concerns</strong> (provider data persistence, sync behavior) and <strong>specific security configurations</strong> (.gitignore) rather than missing entire feature areas. This suggests the plan prioritizes getting features right while leaving some infrastructure subtleties unspecified.
+          </div>
+        </div>
+        <div class="narrative-card">
+          <div class="narrative-title">
+            <span class="icon">💪</span>
+            Strength Clusters
+          </div>
+          <div class="narrative-content">
+            <ul class="strength-list">
+              <li><strong>Concepts, Explore Similar & Alchemy</strong> — 100% coverage with fully detailed multi-step flows</li>
+              <li><strong>AI Voice, Persona & Quality</strong> — Complete persona specification with tone sliders and rubric</li>
+              <li><strong>Ask Chat</strong> — Exact JSON contract, retry behavior, summarization all specified</li>
+              <li><strong>Infrastructure & Isolation</strong> — All benchmark-mode requirements met</li>
+              <li><strong>Show Detail</strong> — 12-section narrative hierarchy preserved verbatim</li>
+            </ul>
+          </div>
+        </div>
+        <div class="narrative-card">
+          <div class="narrative-title">
+            <span class="icon">⚠️</span>
+            Weakness Clusters
+          </div>
+          <div class="narrative-content">
+            <ul class="weakness-list">
+              <li><strong>Provider Data Architecture</strong> — No distinction between persisted IDs and transient fetches</li>
+              <li><strong>Sync Behavior</strong> — Cross-device sync unarchitected despite being in PRD</li>
+              <li><strong>Tag Library Management</strong> — Schema present but UX unspecified</li>
+              <li><strong>Security Config</strong> — .gitignore rules missing for .env* files</li>
+              <li><strong>Hidden Status</strong> — "Next" status not mentioned in plan</li>
+            </ul>
+          </div>
+        </div>
+        <div class="narrative-card full-width">
+          <div class="narrative-title">
+            <span class="icon">⚡</span>
+            Risk Assessment
+          </div>
+          <div class="narrative-content">
+            If executed as-is, the most likely failure mode is <strong>data integrity issues during catalog refreshes and offline scenarios</strong>. Without explicit handling of provider data persistence vs. transient fetches, the app may lose streaming availability data or over-fetch on every interaction. Users relying on the "Stream It" section will have inconsistent experiences.
+            <br><br>
+            A secondary risk is <strong>tag-based organization feeling incomplete</strong>. Tags power filters across the app, but without a clear tag library management UX, users may struggle to build meaningful personal collections. The security configuration gaps represent lower immediate risk but should be corrected before production deployment.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Action Items -->
+    <section class="actions-section">
+      <h2 class="section-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        Recommended Actions
+      </h2>
+      <div class="actions-list">
+        <div class="action-item">
+          <span class="action-priority high">High</span>
+          <div>
+            <div class="action-text">Add .gitignore specification with .env* exclusion rules (PRD-004, PRD-006)</div>
+            <div class="action-prds">PRD-004, PRD-006</div>
+          </div>
+        </div>
+        <div class="action-item">
+          <span class="action-priority high">High</span>
+          <div>
+            <div class="action-text">Document provider data architecture: persisted IDs vs. transient fetches (PRD-036)</div>
+            <div class="action-prds">PRD-036</div>
+          </div>
+        </div>
+        <div class="action-item">
+          <span class="action-priority medium">Medium</span>
+          <div>
+            <div class="action-text">Design tag library management UX (PRD-021)</div>
+            <div class="action-prds">PRD-021</div>
+          </div>
+        </div>
+        <div class="action-item">
+          <span class="action-priority medium">Medium</span>
+          <div>
+            <div class="action-text">Define sync architecture with conflict resolution and duplicate detection (PRD-033)</div>
+            <div class="action-prds">PRD-033</div>
+          </div>
+        </div>
+        <div class="action-item">
+          <span class="action-priority low">Low</span>
+          <div>
+            <div class="action-text">Clarify hidden "Next" status support in data model (PRD-019)</div>
+            <div class="action-prds">PRD-019</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Plan Evaluation Report — Generated from canonical requirements catalog (v1)</p>
+      <p style="margin-top: 8px;">99 requirements across 10 functional areas evaluated against PLAN.md</p>
+    </footer>
+  </div>
+</body>
+</html>
